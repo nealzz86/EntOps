@@ -1,0 +1,271 @@
+﻿{
+    "WPFAppxMicrosoft_WindowsFeedbackHub": {
+        "Category": "微软应用",
+        "Content": "反馈中心",
+        "Description": "允许用户直接向 Microsoft 提交错误报告、功能建议和诊断数据。",
+        "Panel": "0",
+        "PackageId": "Microsoft.WindowsFeedbackHub",
+        "StoreId": "9NBLGGH4R32N"
+    },
+    "WPFAppxMicrosoft_GetHelp": {
+        "Category": "微软应用",
+        "Content": "获取帮助",
+        "Description": "提供自动化故障排查指南、支持文档以及 Microsoft 客户直接协助。",
+        "Panel": "0",
+        "PackageId": "Microsoft.GetHelp",
+        "StoreId": "9PKDZBMV1H3T"
+    },
+    "WPFAppxMicrosoft_OutlookForWindows": {
+        "Category": "微软应用",
+        "Content": "Windows 版 Outlook",
+        "Description": "提供现代化的电子邮件管理、日历安排和联系人组织功能。",
+        "Panel": "0",
+        "PackageId": "Microsoft.OutlookForWindows",
+        "StoreId": "9NRX63209R7B"
+    },
+    "WPFAppxMSTeams": {
+        "Category": "微软应用",
+        "Content": "Microsoft Teams 协作",
+        "Description": "支持即时消息、视频会议、文件分享和工作区协作。",
+        "Panel": "0",
+        "PackageId": "MSTeams",
+        "StoreId": "XP8BT8DW290MPQ"
+    },
+    "WPFAppxClipchamp_Clipchamp": {
+        "Category": "实用工具",
+        "Content": "Clipchamp 视频编辑器",
+        "Description": "提供易于上手的视频编辑器，内置模板、特效和时间轴编辑工具。",
+        "Panel": "0",
+        "PackageId": "Clipchamp.Clipchamp",
+        "StoreId": "9P1J8S7CCWWT"
+    },
+    "WPFAppxMicrosoft_MicrosoftOfficeHub": {
+        "Category": "微软应用",
+        "Content": "Microsoft 365 应用中心",
+        "Description": "作为集中启动器和仪表板，用于访问云端 Microsoft 365 应用和最近文档。",
+        "Panel": "0",
+        "PackageId": "Microsoft.MicrosoftOfficeHub",
+        "StoreId": "9WZDNCRD29V9"
+    },
+    "WPFAppxMicrosoft_ZuneMusic": {
+        "Category": "实用工具",
+        "Content": "媒体播放器",
+        "Description": "播放本地音频和视频文件，支持现代播放列表管理和投屏功能。",
+        "Panel": "0",
+        "PackageId": "Microsoft.ZuneMusic",
+        "StoreId": "9WZDNCRFJ3PT"
+    },
+    "WPFAppxMicrosoft_BingSearch": {
+        "Category": "Bing 与 Web 服务",
+        "Content": "Bing 搜索",
+        "Description": "将 Microsoft Bing 搜索能力和 Web 服务直接集成到操作系统中。",
+        "Panel": "1",
+        "PackageId": "Microsoft.BingSearch",
+        "StoreId": "9NZBF4GT040C"
+    },
+    "WPFAppxMicrosoftCorporationII_QuickAssist": {
+        "Category": "实用工具",
+        "Content": "快速助手",
+        "Description": "通过互联网连接实现安全的远程技术支持和屏幕共享。",
+        "Panel": "0",
+        "PackageId": "MicrosoftCorporationII.QuickAssist",
+        "StoreId": "9P7BP5VNWKX5"
+    },
+    "WPFAppxMicrosoft_WindowsDevHome": {
+        "Category": "开发工具",
+        "Content": "Dev Home 开发主页",
+        "Description": "为软件开发环境配置、仓库同步和硬件小部件提供专用仪表板。",
+        "Panel": "1",
+        "PackageId": "Microsoft.Windows.DevHome",
+        "StoreId": "9N8MHTPHNGVV"
+    },
+    "WPFAppxMicrosoft_WindowsCrossDevice": {
+        "Category": "微软生态",
+        "Content": "移动设备",
+        "Description": "管理与已配对移动设备的系统级后台连接。移除后可能导致跨设备功能不可用，例如手机屏幕镜像、文件传输以及 Windows 设置中集成的移动热点接力。",
+        "Panel": "0",
+        "PackageId": "MicrosoftWindows.CrossDevice",
+        "StoreId": "9NTXGKQ8P7N0"
+    },
+    "WPFAppxMicrosoft_Todos": {
+        "Category": "实用工具",
+        "Content": "To Do 待办清单",
+        "Description": "创建、跟踪并同步个人任务、智能列表和每日提醒。",
+        "Panel": "0",
+        "PackageId": "Microsoft.Todos",
+        "StoreId": "9NBLGGH5R558"
+    },
+    "WPFAppxMicrosoft_PowerAutomateDesktop": {
+        "Category": "开发工具",
+        "Content": "Power Automate 自动化",
+        "Description": "使用低代码可视化脚本自动化重复性工作流程和桌面任务。",
+        "Panel": "1",
+        "PackageId": "Microsoft.PowerAutomateDesktop",
+        "StoreId": "9NFTCH6J7FHV"
+    },
+    "WPFAppxMicrosoft_YourPhone": {
+        "Category": "微软生态",
+        "Content": "手机连接",
+        "Description": "将移动设备的短信、通知、照片和通话同步到电脑。",
+        "Panel": "0",
+        "PackageId": "Microsoft.YourPhone",
+        "StoreId": "9NMPJ99VJBWV"
+    },
+    "WPFAppxMicrosoft_MicrosoftStickyNotes": {
+        "Category": "实用工具",
+        "Content": "便笺",
+        "Description": "在桌面上创建可自动跨设备同步的浮动文本便签。",
+        "Panel": "0",
+        "PackageId": "Microsoft.MicrosoftStickyNotes",
+        "StoreId": "9NBLGGH4QGHW"
+    },
+    "WPFAppxMicrosoft_WindowsSoundRecorder": {
+        "Category": "实用工具",
+        "Content": "录音机",
+        "Description": "录制和剪辑实时音频输入，提供简单的麦克风调节控制。",
+        "Panel": "0",
+        "PackageId": "Microsoft.WindowsSoundRecorder",
+        "StoreId": "9WZDNCRFHWKN"
+    },
+    "WPFAppxMicrosoft_WindowsAlarms": {
+        "Category": "实用工具",
+        "Content": "时钟",
+        "Description": "提供世界时钟、闹钟、倒计时、秒表以及专注时段跟踪功能。",
+        "Panel": "0",
+        "PackageId": "Microsoft.WindowsAlarms",
+        "StoreId": "9WZDNCRFJ3PR"
+    },
+    "WPFAppxMicrosoft_Paint": {
+        "Category": "实用工具",
+        "Content": "画图",
+        "Description": "内置数字素描、基础图像编辑和像素级图形处理工具。",
+        "Panel": "0",
+        "PackageId": "Microsoft.Paint",
+        "StoreId": "9PCFS5B6T72H"
+    },
+    "WPFAppxMicrosoft_WindowsNotepad": {
+        "Category": "实用工具",
+        "Content": "记事本",
+        "Description": "轻量级文本编辑器，支持多标签页打开纯文本文件和代码片段。",
+        "Panel": "0",
+        "PackageId": "Microsoft.WindowsNotepad",
+        "StoreId": "9MSMLRH6LZF3"
+    },
+    "WPFAppxMicrosoft_ScreenSketch": {
+        "Category": "实用工具",
+        "Content": "截图工具",
+        "Description": "捕获截图或屏幕录像，内置标注、图像裁剪和光学字符识别(OCR)功能。",
+        "Panel": "0",
+        "PackageId": "Microsoft.ScreenSketch",
+        "StoreId": "9MZ95KL8MR0L"
+    },
+    "WPFAppxMicrosoft_Copilot": {
+        "Category": "Bing 与 Web 服务",
+        "Content": "Copilot 智能助手",
+        "Description": "启动 Microsoft AI 助手，提供上下文问答、创意写作辅助和智能网络搜索。",
+        "Panel": "1",
+        "PackageId": "Microsoft.Copilot",
+        "StoreId": "9NHT9RB2F4HD"
+    },
+    "WPFAppxMicrosoft_WindowsCalculator": {
+        "Category": "实用工具",
+        "Content": "计算器",
+        "Description": "执行标准算术、科学计算、程序员计算和单位换算。",
+        "Panel": "0",
+        "PackageId": "Microsoft.WindowsCalculator",
+        "StoreId": "9WZDNCRFHVN5"
+    },
+    "WPFAppxMicrosoft_WindowsCamera": {
+        "Category": "实用工具",
+        "Content": "相机",
+        "Description": "通过连接的摄像头或影像设备拍照和录制视频。",
+        "Panel": "0",
+        "PackageId": "Microsoft.WindowsCamera",
+        "StoreId": "9WZDNCRFJBBG"
+    },
+    "WPFAppxMicrosoft_WindowsPhotos": {
+        "Category": "实用工具",
+        "Content": "照片",
+        "Description": "组织、查看和裁剪本地图片，提供基础色彩调整和相册创建工具。",
+        "Panel": "0",
+        "PackageId": "Microsoft.Windows.Photos",
+        "StoreId": "9WZDNCRFJBH4"
+    },
+    "WPFAppxMicrosoft_BingNews": {
+        "Category": "Bing 与 Web 服务",
+        "Content": "新闻",
+        "Description": "聚合突发新闻头条、个性化文章推送和全球时事。",
+        "Panel": "1",
+        "PackageId": "Microsoft.BingNews",
+        "StoreId": "9WZDNCRFHVFW"
+    },
+    "WPFAppxMicrosoft_BingWeather": {
+        "Category": "Bing 与 Web 服务",
+        "Content": "天气",
+        "Description": "显示本地实时天气、雷达地图和历史气象预报。",
+        "Panel": "1",
+        "PackageId": "Microsoft.BingWeather",
+        "StoreId": "9WZDNCRFJ3Q2"
+    },
+    "WPFAppxMicrosoft_GamingApp": {
+        "Category": "Xbox 与游戏",
+        "Content": "Xbox 应用",
+        "Description": "作为主要游戏库管理器、社交社区界面和 PC Game Pass 仪表板。",
+        "Panel": "1",
+        "PackageId": "Microsoft.GamingApp",
+        "StoreId": "9MV0B5HZVK9Z"
+    },
+    "WPFAppxMicrosoft_XboxGamingOverlay": {
+        "Category": "Xbox 与游戏",
+        "Content": "Xbox Game Bar 游戏栏",
+        "Description": "提供可自定义的游戏内状态小部件、音频平衡滑块、系统监控工具和游戏录制功能。",
+        "Panel": "1",
+        "PackageId": "Microsoft.XboxGamingOverlay",
+        "StoreId": "9NZKPSTSNW4P"
+    },
+    "WPFAppxMicrosoft_XboxIdentityProvider": {
+        "Category": "Xbox 与游戏",
+        "Content": "Xbox 身份验证提供程序",
+        "Description": "管理 Xbox 网络用户身份验证和已连接游戏的后台账户校验。警告:移除后可能导致依赖此身份验证流程的非 Xbox 游戏和应用无法登录 Microsoft 账户。",
+        "Panel": "1",
+        "PackageId": "Microsoft.XboxIdentityProvider",
+        "StoreId": "9WZDNCRD1HKW"
+    },
+    "WPFAppxMicrosoft_XboxSpeechToTextOverlay": {
+        "Category": "Xbox 与游戏",
+        "Content": "Xbox 语音转文本叠加层",
+        "Description": "为游戏聊天网络提供系统级实时无障碍字幕和语音转文本转换。",
+        "Panel": "1",
+        "PackageId": "Microsoft.XboxSpeechToTextOverlay"
+    },
+    "WPFAppxMicrosoft_Xbox_TCUI": {
+        "Category": "Xbox 与游戏",
+        "Content": "Xbox TCUI 账户界面",
+        "Description": "为游戏内的单点登录流程提供核心账户连接界面模块。警告:移除后可能导致其他并不依赖 Xbox 应用的游戏和 Microsoft 账户应用无法完成身份验证。",
+        "Panel": "1",
+        "PackageId": "Microsoft.Xbox.TCUI"
+    },
+    "WPFAppxMicrosoft_StartExperiencesApp": {
+        "Category": "Bing 与 Web 服务",
+        "Content": "开始体验小组件",
+        "Description": "驱动 Windows 小组件面板，提供个性化的新闻、天气、体育和财经内容推送。",
+        "Panel": "1",
+        "PackageId": "Microsoft.StartExperiencesApp",
+        "StoreId": "9PC1H9VN18CM"
+    },
+    "WPFAppxMicrosoft_MicrosoftSolitaireCollection": {
+        "Category": "Xbox 与游戏",
+        "Content": "微软纸牌合集",
+        "Description": "内置多种纸牌玩法，包括空当接龙、蜘蛛纸牌、Klondike 接龙、金字塔纸牌和三峰纸牌，并附每日挑战。",
+        "Panel": "1",
+        "PackageId": "Microsoft.MicrosoftSolitaireCollection"
+    },
+    "WPFAppxMicrosoft_ZuneVideo": {
+        "Category": "实用工具",
+        "Content": "电影和电视",
+        "Description": "默认视频播放器，也可用于购买或租赁影音内容。",
+        "Panel": "0",
+        "PackageId": "Microsoft.ZuneVideo",
+        "StoreId": "9WZDNCRFJ3P2"
+    }
+}

@@ -1,0 +1,430 @@
+{
+  "wechat": {
+    "category": "通讯协作",
+    "choco": "wechat",
+    "content": "微信",
+    "description": "国内主流即时通讯工具，工作群沟通、文件传输、客户联系都离不开它。",
+    "link": "https://weixin.qq.com/",
+    "winget": "Tencent.WeChat",
+    "foss": false
+  },
+  "wecom": {
+    "category": "通讯协作",
+    "choco": "na",
+    "content": "企业微信",
+    "description": "腾讯推出的企业通讯与办公平台，考勤审批、组织架构、与微信互通。",
+    "link": "https://work.weixin.qq.com/",
+    "winget": "Tencent.WeCom",
+    "foss": false
+  },
+  "qq": {
+    "category": "通讯协作",
+    "choco": "qq",
+    "content": "QQ",
+    "description": "腾讯 QQ，大文件传输、群聊、屏幕共享等场景仍然常用。",
+    "link": "https://im.qq.com/",
+    "winget": "Tencent.QQ",
+    "foss": false
+  },
+  "dingtalk": {
+    "category": "通讯协作",
+    "choco": "dingtalk",
+    "content": "钉钉",
+    "description": "阿里巴巴企业协作平台：DING 消息、审批、考勤打卡、视频会议。",
+    "link": "https://www.dingtalk.com/",
+    "winget": "Alibaba.DingTalk",
+    "foss": false
+  },
+  "feishu": {
+    "category": "通讯协作",
+    "choco": "na",
+    "content": "飞书",
+    "description": "字节跳动协作办公平台：消息、云文档、日历、妙记和视频会议一体化。",
+    "link": "https://www.feishu.cn/",
+    "winget": "ByteDance.Feishu",
+    "foss": false
+  },
+  "tencentmeeting": {
+    "category": "通讯协作",
+    "choco": "tencentmeeting",
+    "content": "腾讯会议",
+    "description": "视频会议客户端，支持屏幕共享、会中协作和远程开会。",
+    "link": "https://meeting.qq.com/",
+    "winget": "Tencent.TencentMeeting",
+    "foss": false
+  },
+  "wpsoffice": {
+    "category": "文档办公",
+    "choco": "na",
+    "content": "WPS Office",
+    "description": "金山办公套件，兼容 Word/Excel/PPT 格式，个人版免费，国内企业标配。",
+    "link": "https://www.wps.cn/",
+    "winget": "Kingsoft.WPSOffice",
+    "foss": false
+  },
+  "kdocs": {
+    "category": "文档办公",
+    "choco": "na",
+    "content": "金山文档",
+    "description": "云端 Office 客户端，支持多人在线协作编辑 WPS 文档和表格。",
+    "link": "https://www.kdocs.cn/",
+    "winget": "Kingsoft.KDocs",
+    "foss": false
+  },
+  "foxitreader": {
+    "category": "文档办公",
+    "choco": "foxitreader",
+    "content": "福昕PDF阅读器",
+    "description": "轻量快速的 PDF 阅读器，支持批注、表单填写，国内办公环境常用。",
+    "link": "https://www.foxitsoftware.cn/pdf-reader/",
+    "winget": "Foxit.FoxitReader",
+    "foss": false
+  },
+  "winrar": {
+    "category": "常用工具",
+    "choco": "winrar",
+    "content": "WinRAR",
+    "description": "经典压缩解压工具，支持 RAR/ZIP/7z 等格式，国内装机量最大的压缩软件之一。",
+    "link": "https://www.rarlab.com/",
+    "winget": "RARLab.WinRAR",
+    "foss": false
+  },
+  "sogouinput": {
+    "category": "输入法",
+    "choco": "na",
+    "content": "搜狗输入法",
+    "description": "主流中文拼音输入法，词库丰富、支持云候选和快捷短语。",
+    "link": "https://shurufa.sogou.com/",
+    "winget": "Sogou.SogouInput",
+    "foss": false
+  },
+  "wechattype": {
+    "category": "输入法",
+    "choco": "na",
+    "content": "微信输入法",
+    "description": "微信官方出品的输入法，手机与电脑打字风格同步，简洁无广告。",
+    "link": "https://zime.weixin.qq.com/",
+    "winget": "Tencent.WeType",
+    "foss": false
+  },
+  "xunlei": {
+    "category": "网络工具",
+    "choco": "xunlei",
+    "content": "迅雷",
+    "description": "老牌下载工具，支持多线程下载、离线下载和磁力链接。",
+    "link": "https://xunlei.com/",
+    "winget": "Thunder.Thunder",
+    "foss": false
+  },
+  "baidunetdisk": {
+    "category": "网络工具",
+    "choco": "na",
+    "content": "百度网盘",
+    "description": "网盘客户端，用于接收分享素材、大文件备份与跨设备同步。",
+    "link": "https://pan.baidu.com/",
+    "winget": "Baidu.BaiduNetdisk",
+    "foss": false
+  },
+  "qqbrowser": {
+    "category": "网络工具",
+    "choco": "na",
+    "content": "QQ浏览器",
+    "description": "腾讯双核浏览器，对国内政务网站、旧版 OA 兼容模式支持较好。",
+    "link": "https://browser.qq.com/",
+    "winget": "Tencent.QQBrowser",
+    "foss": false
+  },
+  "potplayer": {
+    "category": "影音娱乐",
+    "choco": "potplayer",
+    "content": "PotPlayer",
+    "description": "高性能本地视频播放器，几乎支持全部格式，国内装机率极高。",
+    "link": "https://potplayer.daum.net/",
+    "winget": "Daum.PotPlayer",
+    "foss": false
+  },
+  "cloudmusic": {
+    "category": "影音娱乐",
+    "choco": "na",
+    "content": "网易云音乐",
+    "description": "在线音乐客户端，歌单和社区氛围好，日常办公听歌常用。",
+    "link": "https://music.163.com/",
+    "winget": "NetEase.CloudMusic",
+    "foss": false
+  },
+  "qqmusic": {
+    "category": "影音娱乐",
+    "choco": "na",
+    "content": "QQ音乐",
+    "description": "腾讯在线音乐客户端，曲库版权全，支持无损音源。",
+    "link": "https://y.qq.com/",
+    "winget": "Tencent.QQMusic",
+    "foss": false
+  },
+  "jianyingpro": {
+    "category": "影音娱乐",
+    "choco": "na",
+    "content": "剪映专业版",
+    "description": "字节跳动官方短视频剪辑工具 PC 版，做宣传视频、剪辑素材方便。",
+    "link": "https://www.capcut.cn/",
+    "winget": "ByteDance.JianyingPro",
+    "foss": false
+  },
+  "todesk": {
+    "category": "远程运维",
+    "choco": "na",
+    "content": "ToDesk",
+    "description": "国产远程控制工具，低延迟内网穿透，适合信息部远程协助同事排障。",
+    "link": "https://www.todesk.com/",
+    "winget": "Youqu.ToDesk",
+    "foss": false
+  },
+  "foxmail": {
+    "category": "通讯协作",
+    "choco": "na",
+    "content": "Foxmail 邮件",
+    "description": "腾讯老牌邮件客户端，收发企业邮箱、POP3/IMAP 配置简单。",
+    "link": "https://www.foxmail.com/",
+    "winget": "Tencent.Foxmail",
+    "foss": false
+  },
+  "tencentvideo": {
+    "category": "影音娱乐",
+    "choco": "na",
+    "content": "腾讯视频",
+    "description": "国内主流长视频平台客户端，追剧、看综艺和体育赛事直播。",
+    "link": "https://v.qq.com/",
+    "winget": "Tencent.TencentVideo",
+    "foss": false
+  },
+  "everything": {
+    "category": "常用工具",
+    "choco": "everything",
+    "content": "Everything 文件搜索",
+    "description": "秒级全盘文件名搜索，找共享盘和资料库里的文件比资源管理器快得多。",
+    "link": "https://www.voidtools.com/zh-cn/",
+    "winget": "voidtools.Everything",
+    "foss": true
+  },
+  "sevenzip": {
+    "category": "常用工具",
+    "choco": "7zip",
+    "content": "7-Zip 压缩",
+    "description": "开源免费压缩工具，压缩率高，支持 7z/ZIP/RAR 等格式，无广告。",
+    "link": "https://www.7-zip.org/",
+    "winget": "7zip.7zip",
+    "foss": true
+  },
+  "bandizip": {
+    "category": "常用工具",
+    "choco": "na",
+    "content": "Bandizip",
+    "description": "轻量压缩解压工具，预览压缩包内容方便，自动识别文件名编码不乱码。",
+    "link": "https://www.bandisoft.com/bandizip/",
+    "winget": "Bandisoft.Bandizip",
+    "foss": false
+  },
+  "snipaste": {
+    "category": "常用工具",
+    "choco": "na",
+    "content": "Snipaste 截图贴图",
+    "description": "F1 截图、F3 把截图贴在屏幕上对照录入，收银对账、改图排错都好用。",
+    "link": "https://www.snipaste.com/",
+    "winget": "liule.Snipaste",
+    "foss": false
+  },
+  "pixpin": {
+    "category": "常用工具",
+    "choco": "na",
+    "content": "PixPin 截图",
+    "description": "国产截图工具，支持滚动长截图、截图 OCR 识字和贴图。",
+    "link": "https://pixpinapp.com/",
+    "winget": "PixPin.PixPin",
+    "foss": false
+  },
+  "notepadpp": {
+    "category": "常用工具",
+    "choco": "notepadplusplus",
+    "content": "Notepad++",
+    "description": "老牌文本编辑器，改配置文件、看日志不乱码不卡死。",
+    "link": "https://notepad-plus-plus.org/",
+    "winget": "Notepad++.Notepad++",
+    "foss": true
+  },
+  "powertoys": {
+    "category": "常用工具",
+    "choco": "powertoys",
+    "content": "PowerToys",
+    "description": "微软官方系统增强工具集：窗口分屏、取色器、批量重命名、FancyZones。",
+    "link": "https://learn.microsoft.com/windows/powertoys/",
+    "winget": "Microsoft.PowerToys",
+    "foss": true
+  },
+  "cpuz": {
+    "category": "常用工具",
+    "choco": "cpuz",
+    "content": "CPU-Z",
+    "description": "查看 CPU、内存、主板硬件信息，装机验收和报修登记常用。",
+    "link": "https://www.cpuid.com/softwares/cpu-z.html",
+    "winget": "CPUID.CPU-Z",
+    "foss": false
+  },
+  "gpuz": {
+    "category": "常用工具",
+    "choco": "na",
+    "content": "GPU-Z",
+    "description": "查看显卡型号、显存和驱动版本，核对显卡配置或排查显示问题。",
+    "link": "https://www.techpowerup.com/gpuz/",
+    "winget": "TechPowerUp.GPU-Z",
+    "foss": false
+  },
+  "hwinfo": {
+    "category": "常用工具",
+    "choco": "na",
+    "content": "HWiNFO 硬件检测",
+    "description": "全面的硬件信息与温度监控工具，判断硬盘健康、机器是否过热。",
+    "link": "https://www.hwinfo.com/",
+    "winget": "REALiX.HWiNFO",
+    "foss": false
+  },
+  "typora": {
+    "category": "文档办公",
+    "choco": "typora",
+    "content": "Typora",
+    "description": "所见即所得的 Markdown 编辑器，写规范文档和操作手册很顺手。",
+    "link": "https://typora.io/",
+    "winget": "Typora.Typora",
+    "foss": false
+  },
+  "obsidian": {
+    "category": "文档办公",
+    "choco": "obsidian",
+    "content": "Obsidian 知识库",
+    "description": "本地优先的笔记与知识库工具，团队运维手册、故障复盘可放共享盘管理。",
+    "link": "https://obsidian.md/",
+    "winget": "Obsidian.Obsidian",
+    "foss": false
+  },
+  "vlc": {
+    "category": "影音娱乐",
+    "choco": "vlc",
+    "content": "VLC 播放器",
+    "description": "开源全能播放器，冷门格式、网络流和监控回放文件都能打开。",
+    "link": "https://www.videolan.org/vlc/",
+    "winget": "VideoLAN.VLC",
+    "foss": true
+  },
+  "winscp": {
+    "category": "网络工具",
+    "choco": "winscp",
+    "content": "WinSCP",
+    "description": "SFTP/FTP 图形化文件传输，往服务器上传站点和备份文件常用。",
+    "link": "https://winscp.net/eng/index.php",
+    "winget": "WinSCP.WinSCP",
+    "foss": true
+  },
+  "filezilla": {
+    "category": "网络工具",
+    "choco": "filezilla",
+    "content": "FileZilla",
+    "description": "跨平台 FTP 客户端，批量上传下载、断点续传稳定。",
+    "link": "https://filezilla-project.org/",
+    "winget": "FileZilla-Project.FileZilla",
+    "foss": true
+  },
+  "putty": {
+    "category": "网络工具",
+    "choco": "putty",
+    "content": "PuTTY",
+    "description": "轻量 SSH/Telnet 终端，登录路由器、交换机和 Linux 服务器排障。",
+    "link": "https://www.putty.org/",
+    "winget": "PuTTY.PuTTY",
+    "foss": true
+  },
+  "rustdesk": {
+    "category": "远程运维",
+    "choco": "na",
+    "content": "RustDesk 远程",
+    "description": "开源远程控制工具，可自建中继服务器，内网机器无公网也能远程。",
+    "link": "https://rustdesk.com/",
+    "winget": "RustDesk.RustDesk",
+    "foss": true
+  },
+  "teamviewer": {
+    "category": "远程运维",
+    "choco": "teamviewer",
+    "content": "TeamViewer",
+    "description": "国际通用远程协助工具，对接供应商和外部系统的远程支持常用。",
+    "link": "https://www.teamviewer.com/cn/",
+    "winget": "TeamViewer.TeamViewer",
+    "foss": false
+  },
+  "anydesk": {
+    "category": "远程运维",
+    "choco": "anydesk",
+    "content": "AnyDesk",
+    "description": "轻量远程控制工具，启动快、带宽占用低，适合临时远程处理。",
+    "link": "https://anydesk.com/zh",
+    "winget": "AnyDesk.AnyDesk",
+    "foss": false
+  },
+  "vscode": {
+    "category": "开发工具",
+    "choco": "vscode",
+    "content": "VS Code",
+    "description": "微软开源代码编辑器，写脚本、改配置、看 JSON 的通用利器。",
+    "link": "https://code.visualstudio.com/",
+    "winget": "Microsoft.VisualStudioCode",
+    "foss": true
+  },
+  "git": {
+    "category": "开发工具",
+    "choco": "git",
+    "content": "Git",
+    "description": "版本控制工具，拉取内部代码仓库、管理脚本变更历史。",
+    "link": "https://git-scm.com/",
+    "winget": "Git.Git",
+    "foss": true
+  },
+  "nodejs": {
+    "category": "开发工具",
+    "choco": "nodejs-lts",
+    "content": "Node.js LTS",
+    "description": "Node.js 长期支持版运行时，跑前端构建和自动化脚本的环境。",
+    "link": "https://nodejs.org/zh-cn",
+    "winget": "OpenJS.NodeJS.LTS",
+    "foss": true
+  },
+  "python": {
+    "category": "开发工具",
+    "choco": "python3",
+    "content": "Python 3",
+    "description": "Python 3 运行环境，运维自动化脚本、表格批处理数据的常用底座。",
+    "link": "https://www.python.org/",
+    "winget": "Python.Python.3.12",
+    "foss": true
+  },
+  "dbeaver": {
+    "category": "开发工具",
+    "choco": "na",
+    "content": "DBeaver 数据库",
+    "description": "开源数据库客户端，一个工具连 MySQL/PostgreSQL/SQL Server 查数据导报表。",
+    "link": "https://dbeaver.io/",
+    "winget": "DBeaver.DBeaver.Community",
+    "foss": true
+  },
+  "Sunlogin": {
+    "type": "Button",
+    "category": "远程运维",
+    "content": "向日葵企业版（SOS）",
+    "description": "从公司共享目录或贝锐官方服务器获取向日葵企业版安装包并启动向导安装，供信息部远程协助同事电脑。",
+    "link": "https://www.oray.com/"
+  },
+  "MeituanPOS": {
+    "type": "Button",
+    "category": "门店收银",
+    "content": "美团收银（门店版）",
+    "description": "优先从公司共享目录查找美团收银安装包并启动安装；没有安装包时打开美团收银官网获取。安装后需门店激活码，由信息部/服务商协助激活。",
+    "link": "https://shouyin.meituan.com/"
+  }
+}

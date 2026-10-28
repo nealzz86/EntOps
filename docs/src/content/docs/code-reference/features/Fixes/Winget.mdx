@@ -1,0 +1,25 @@
+---
+title: "WinGet - Reinstall"
+description: ""
+editUrl: false
+---
+
+:::note
+This page is generated from [`functions/public/Invoke-WPFFixesWinget.ps1`](https://github.com/ChrisTitusTech/winutil/blob/main/functions/public/Invoke-WPFFixesWinget.ps1). Do not edit this page directly.
+:::
+
+```powershell title="functions/public/Invoke-WPFFixesWinget.ps1"
+function Invoke-WPFFixesWinget {
+
+    <#
+
+    .SYNOPSIS
+        Fixes WinGet by running `choco install winget`
+    .DESCRIPTION
+        BravoNorris for the fantastic idea of a button to reinstall WinGet
+    #>
+
+    Step-WinUtilJob -Status "Repairing WinGet" -State "Indeterminate"
+    Install-WinUtilWinget -Force
+}
+```

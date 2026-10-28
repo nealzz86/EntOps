@@ -1,0 +1,40 @@
+{
+    "products": [
+        {
+            "key": "360",
+            "name": "360 安全卫士 / 360 杀毒",
+            "checkbox": "WPFEntClean360",
+            "displayNameRegex": "360安全卫士|360杀毒|360企业安全",
+            "installDirs": ["$PFX86\\360", "$PF\\360"],
+            "programDataDirs": ["$PD\\360safe", "$PD\\360Login"],
+            "userDataDirs": ["AppData\\Roaming\\360Safe", "AppData\\Local\\360Safe", "AppData\\Roaming\\360Login", "AppData\\Roaming\\360Desktop"],
+            "processNames": ["360Tray.exe", "ccenter.exe", "ZhuDongFangYu.exe", "360Safe.exe", "360Safebox.exe", "360sd.exe", "360rp.exe", "360base.exe", "360leakfixer.exe", "LiveUpdate360.exe", "QHSafeTray.exe", "SoftMgr.exe", "wudetectsvc.exe"],
+            "registryKeys": ["HKLM:\\SOFTWARE\\WOW6432Node\\360Safe", "HKLM:\\SOFTWARE\\360Safe", "HKCU:\\Software\\360Safe"],
+            "silentUninstallArgs": ["/s", "S"]
+        },
+        {
+            "key": "kingsoft",
+            "name": "金山毒霸",
+            "checkbox": "WPFEntCleanKingsoft",
+            "displayNameRegex": "金山毒霸|Kingsoft Antivirus|金山猎豹",
+            "installDirs": ["$PFX86\\Kingsoft\\Kingsoft Internet Security 9", "$PFX86\\Kingsoft\\Kingsoft Internet Security", "$PFX86\\Kingsoft\\duba", "$PFX86\\Kingsoft\\antivirus", "$PFX86\\KSafe", "$PF\\Kingsoft\\antivirus"],
+            "programDataDirs": [],
+            "userDataDirs": ["AppData\\Roaming\\kingsoft\\duba", "AppData\\Local\\kingsoft\\duba"],
+            "processNames": ["kxetray.exe", "duba.exe", "kws.exe", "kwatchd.exe", "kwsprotect.exe", "ksafewatchdog.exe", "kwfr.exe", "kwsservice.exe"],
+            "registryKeys": ["HKLM:\\SOFTWARE\\WOW6432Node\\Kingsoft\\Duba", "HKLM:\\SOFTWARE\\Kingsoft\\Duba"],
+            "silentUninstallArgs": ["/S"]
+        },
+        {
+            "key": "tencent",
+            "name": "腾讯电脑管家",
+            "checkbox": "WPFEntCleanTencent",
+            "displayNameRegex": "腾讯电脑管家|QQ电脑管家|Tencent PC Manager",
+            "installDirs": ["$PFX86\\Tencent\\QQPCMgr", "$PF\\Tencent\\QQPCMgr"],
+            "programDataDirs": ["$PD\\Tencent\\QQPCMgr"],
+            "userDataDirs": ["AppData\\Roaming\\Tencent\\QQPCMgr", "AppData\\Local\\Tencent\\QQPCMgr"],
+            "processNames": ["QQPCRTP.exe", "QQPCTray.exe", "QQPCMgr.exe", "QQPCFileStore.exe", "TencentDefender.exe"],
+            "registryKeys": ["HKLM:\\SOFTWARE\\WOW6432Node\\Tencent\\QQPCMgr", "HKLM:\\SOFTWARE\\Tencent\\QQPCMgr", "HKCU:\\Software\\Tencent\\QQPCMgr"],
+            "silentUninstallArgs": ["/S"]
+        }
+    ]
+}

@@ -1,0 +1,83 @@
+﻿{
+    "WPFInstall": {
+        "Content": "安装/升级所选应用",
+        "Category": "____操作",
+        "Type": "Button",
+        "Order": "1",
+        "Description": "安装或升级你勾选的应用"
+    },
+    "WPFUninstall": {
+        "Content": "卸载所选应用",
+        "Category": "____操作",
+        "Type": "Button",
+        "Order": "2",
+        "Description": "卸载你勾选的应用"
+    },
+    "WPFInstallUpgrade": {
+        "Content": "升级全部应用",
+        "Category": "____操作",
+        "Type": "Button",
+        "Order": "3",
+        "Description": "将已安装应用升级到最新版本"
+    },
+    "WingetRadioButton": {
+        "Content": "WinGet",
+        "Category": "__包管理器",
+        "Type": "RadioButton",
+        "GroupName": "PackageManagerGroup",
+        "Checked": true,
+        "Order": "1",
+        "Description": "使用 Winget 作为包管理器"
+    },
+    "ChocoRadioButton": {
+        "Content": "Chocolatey",
+        "Category": "__包管理器",
+        "Type": "RadioButton",
+        "GroupName": "PackageManagerGroup",
+        "Checked": false,
+        "Order": "2",
+        "Description": "使用 Chocolatey 作为包管理器"
+    },
+    "WPFCollapseAllCategories": {
+        "Content": "收起全部分类",
+        "Category": "__选择",
+        "Type": "Button",
+        "Order": "1",
+        "Description": "收起所有应用分类"
+    },
+    "WPFExpandAllCategories": {
+        "Content": "展开全部分类",
+        "Category": "__选择",
+        "Type": "Button",
+        "Order": "2",
+        "Description": "展开所有应用分类"
+    },
+    "WPFClearInstallSelection": {
+        "Content": "清空选择",
+        "Category": "__选择",
+        "Type": "Button",
+        "Order": "3",
+        "Description": "清空已选择的应用"
+    },
+    "WPFGetInstalled": {
+        "Content": "获取已安装",
+        "Category": "__选择",
+        "Type": "Button",
+        "Order": "4",
+        "Description": "显示已安装的应用"
+    },
+    "WPFselectedAppsButton": {
+        "Content": "已选应用：0",
+        "Category": "__选择",
+        "Type": "Button",
+        "Order": "5",
+        "Description": "显示已选择的应用"
+    },
+    "WPFInstallFOSSInfo": {
+        "Content": "自由与开源软件",
+        "Category": "__选择",
+        "Type": "Note",
+        "Order": "0",
+        "Description": "说明应用条目上的 #FOSS 标签"
+    }
+}

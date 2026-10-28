@@ -1,0 +1,127 @@
+{
+    "formName": "易快报打印模式",
+    "formWidthTenthMm": 1400,
+    "formHeightTenthMm": 2400,
+    "colorUserCode": "",
+    "driverDirNames": [
+        "drivers",
+        "driver"
+    ],
+    "printers": [
+        {
+            "Name": "前台打印机",
+            "Ip": "192.168.10.20",
+            "PortName": "IP_192.168.10.20",
+            "DriverName": "RICOH PCL6 UniversalDriver V4.30",
+            "DriverZip": "driver.zip",
+            "DriverFile": "ricu0ugr.dll",
+            "DataFile": "ricu0ucd.psz",
+            "ConfigFile": "ricu0uui.dll",
+            "HelpFile": "ricu0uch.chm",
+            "DependentFiles": [
+                "ricu0uui.dll",
+                "ricu0uui.irj",
+                "ricu0uui.rdj",
+                "ricu0uui.rcf",
+                "ricu0uug.dll",
+                "ricu0uug.miz",
+                "ricu0uur.dll",
+                "ricu0ugr.dll",
+                "ricu0ugl.dll",
+                "ricu0uci.dll",
+                "ricu0ucd.dll",
+                "ricu0ucd.psz",
+                "ricu0ucf.cfz",
+                "ricu0ucl.ini",
+                "ricu0uch.chm",
+                "ricu0ucz.dlz",
+                "ricu0ucj.dll",
+                "ricu0uct.dll",
+                "ricu0ucb.dll",
+                "ricu0utl.exe",
+                "ricu0utc.exe",
+                "ricu0utt.exe",
+                "ricu0utf.exe",
+                "ricu0ulm.dll",
+                "ricdb64.dll",
+                "mfricr64.dll",
+                "RD01Kd64.dll",
+                "copcl6ud.txt"
+            ],
+            "Location": "示例位置一",
+            "SupportColor": true
+        },
+        {
+            "Name": "财务打印机",
+            "Ip": "192.168.10.21",
+            "PortName": "IP_192.168.10.21",
+            "DriverName": "RICOH PCL6 UniversalDriver V4.29",
+            "DriverZip": "driver2.zip",
+            "DriverFile": "ricu0tgr.dll",
+            "DataFile": "ricu0tcd.psz",
+            "ConfigFile": "ricu0tui.dll",
+            "HelpFile": "ricu0tch.chm",
+            "DependentFiles": [
+                "ricu0tui.dll",
+                "ricu0tui.irj",
+                "ricu0tui.rdj",
+                "ricu0tui.rcf",
+                "ricu0tug.dll",
+                "ricu0tug.miz",
+                "ricu0tur.dll",
+                "ricu0tgr.dll",
+                "ricu0tgl.dll",
+                "ricu0tci.dll",
+                "ricu0tcd.dll",
+                "ricu0tcd.psz",
+                "ricu0tcf.cfz",
+                "ricu0tcl.ini",
+                "ricu0tch.chm",
+                "ricu0tcz.dlz",
+                "ricu0tcj.dll",
+                "ricu0tct.dll",
+                "ricu0tcb.dll",
+                "ricu0ttl.exe",
+                "ricu0ttc.exe",
+                "ricu0ttt.exe",
+                "ricu0ttf.exe",
+                "ricu0tlm.dll",
+                "ricdb64.dll",
+                "mfricr64.dll",
+                "RD01Kd64.dll",
+                "copcl6ud.txt"
+            ],
+            "Location": "示例位置二",
+            "SupportColor": false
+        }
+    ],
+    "shares": [
+        {
+            "Name": "共享文件夹一",
+            "Paths": [
+                "\\192.168.10.30\\share1"
+            ],
+            "User": "共享账号",
+            "Pass": "",
+            "Drive": "S:"
+        },
+        {
+            "Name": "共享文件夹二",
+            "Paths": [
+                "\\192.168.10.30\\share2"
+            ],
+            "User": "共享账号",
+            "Pass": "",
+            "Drive": "J:"
+        },
+        {
+            "Name": "共享文件夹三",
+            "Paths": [
+                "\\192.168.10.30\\share3"
+            ],
+            "User": "共享账号",
+            "Pass": "",
+            "Drive": "M:"
+        }
+    ]
+}
