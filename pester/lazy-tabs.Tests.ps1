@@ -150,9 +150,11 @@ Describe "Startup lazy tab wiring" {
     It "builds no tab content before first paint" {
         # Startup moved out of main.ps1 and onto the interface thread. Nothing is built up front
         # at all now: Invoke-WPFTab builds whichever tab it selects, and the warmup does the rest.
+        # The dashboard (WPFTab9BT) is the tab opened at startup, in both online and offline mode.
         $uiScript = Get-Content -Path (Join-Path $script:repoRoot "functions\private\Start-WinUtilUserInterface.ps1") -Raw
 
-        $uiScript | Should -Match 'Invoke-WPFTab "WPFTab1BT"'
+        $uiScript | Should -Match 'Invoke-WPFTab "WPFTab9BT"'
+        $uiScript | Should -Not -Match 'Invoke-WPFTab "WPFTab1BT"'
         $uiScript | Should -Not -Match 'targetGridName "tweakspanel"'
         $uiScript | Should -Not -Match 'targetGridName "featurespanel"'
         $uiScript | Should -Not -Match 'targetGridName "appxpanel"'

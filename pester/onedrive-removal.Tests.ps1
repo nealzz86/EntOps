@@ -35,7 +35,7 @@ Describe 'OneDrive removal' {
         Mock Start-Process { }
         $script:explorer = [System.Diagnostics.Process]::new()
         $script:explorer | Add-Member -MemberType NoteProperty -Name ProcessName -Value 'Explorer' -Force
-        Mock Get-Process { $script:explorer }
+        Mock Get-Process { if ($Name -eq 'Explorer') { $script:explorer } }
         Mock Stop-Process { }
         Mock Set-Service { }
         Mock Remove-Item { }
@@ -98,7 +98,9 @@ Describe 'OneDrive removal' {
     It 'stops only a running FileCoAuth process and still stops Explorer' {
         $script:fileCoAuth = [System.Diagnostics.Process]::new()
         $script:fileCoAuth | Add-Member -MemberType NoteProperty -Name ProcessName -Value 'FileCoAuth' -Force
-        Mock Get-Process { $script:fileCoAuth; $script:explorer }
+        Mock Get-Process {
+            if ($Name -eq 'Explorer') { $script:explorer } elseif ($Name -eq 'FileCoAuth') { $script:fileCoAuth }
+        }
         & $script:removeOneDrive
         Should -Invoke Stop-Process -Times 1 -Exactly -ParameterFilter { $InputObject -eq $script:fileCoAuth }
         Should -Invoke Stop-Process -Times 1 -Exactly -ParameterFilter { $InputObject -eq $script:explorer }

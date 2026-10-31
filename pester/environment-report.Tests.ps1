@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - Environment Report
 #===========================================================================
 
@@ -12,6 +12,15 @@ BeforeAll {
     . (Join-Path $script:repoRoot "functions\private\Get-WinUtilEnvironmentReport.ps1")
     . (Join-Path $script:repoRoot "functions\private\Get-WinUtilEnvironmentReportLogsPath.ps1")
     . (Join-Path $script:repoRoot "functions\private\Write-WinUtilEnvironmentReportExport.ps1")
+
+    # Stand-ins for the native package managers so Mock can attach to them on a machine that has
+    # neither winget nor choco installed (functions win command resolution over external ones).
+    function winget {
+        param([Parameter(ValueFromRemainingArguments = $true)]$Arguments)
+    }
+    function choco {
+        param([Parameter(ValueFromRemainingArguments = $true)]$Arguments)
+    }
 }
 
 Describe "Get-WinUtilEnvironmentReport" {
@@ -198,7 +207,7 @@ Describe "Invoke-WPFExportEnvironmentReport overwrite protection" {
     It "aborts rather than retaining a stale companion when logs are excluded" {
         $source = Get-Content -LiteralPath (Join-Path $script:repoRoot "functions\public\Invoke-WPFExportEnvironmentReport.ps1") -Raw
 
-        $source | Should -Match 'if \(-not \$includeLogs\) \{[\s\S]*Choose another report filename[\s\S]*return'
+        $source | Should -Match 'if \(-not \$includeLogs\) \{[\s\S]*请改用其他报告文件名[\s\S]*return'
         $source | Should -Match 'if \(-not \$replaceLogs\) \{\s*return\s*\}'
     }
 }

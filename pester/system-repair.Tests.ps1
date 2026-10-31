@@ -52,7 +52,7 @@ Describe "Invoke-WPFSystemRepair chkdsk exit codes" {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3 } else { 0 }) }
         }
 
-        { Invoke-WPFSystemRepair } | Should -Throw "*Checking the disk for errors failed with exit code 3*"
+        { Invoke-WPFSystemRepair } | Should -Throw "*「正在检查磁盘错误」执行失败，退出码 3*"
     }
 
     It "does not run the later steps once chkdsk has failed" {
@@ -88,7 +88,7 @@ Describe "Invoke-WPFSystemRepair per step codes" {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "chkdsk") { 3010 } else { 0 }) }
         }
 
-        { Invoke-WPFSystemRepair } | Should -Throw "*exit code 3010*"
+        { Invoke-WPFSystemRepair } | Should -Throw "*退出码 3010*"
     }
 
     It "fails on any non-zero from sfc, which has no success codes of its own" {
@@ -96,6 +96,6 @@ Describe "Invoke-WPFSystemRepair per step codes" {
             [pscustomobject]@{ ExitCode = $(if (($ArgumentList -join " ") -match "sfc") { 1 } else { 0 }) }
         }
 
-        { Invoke-WPFSystemRepair } | Should -Throw "*Scanning protected system files failed with exit code 1*"
+        { Invoke-WPFSystemRepair } | Should -Throw "*「正在扫描受保护的系统文件」执行失败，退出码 1*"
     }
 }

@@ -16,7 +16,7 @@ function Start-WinUtilDiskAnaScan {
     #>
     param([string]$Root)
 
-    Append-WinUtilDiskLog -Message "磁盘分析开始扫描 $Root （大磁盘可能需要几分钟）"
+    Write-WinUtilDiskLog -Message "磁盘分析开始扫描 $Root （大磁盘可能需要几分钟）"
 
     $rootTrim = $Root.TrimEnd("\")
     $prefixLen = $rootTrim.Length + 1
@@ -107,7 +107,7 @@ function Start-WinUtilDiskAnaScan {
         Prefix    = ""
     }
 
-    Append-WinUtilDiskLog -Message "磁盘分析完成：$Root 共 $fileCount 个文件 / $dirCount 个目录，合计 $(Format-WinUtilJunkSize $total)，耗时 $($sync.DiskAna.Seconds) 秒。"
+    Write-WinUtilDiskLog -Message "磁盘分析完成：$Root 共 $fileCount 个文件 / $dirCount 个目录，合计 $(Format-WinUtilJunkSize $total)，耗时 $($sync.DiskAna.Seconds) 秒。"
 
     Invoke-WPFUIThread -Parameters @{ Prefix = "" } -ScriptBlock {
         param($Prefix)

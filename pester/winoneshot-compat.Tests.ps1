@@ -265,7 +265,13 @@ BeforeAll {
         )
 
         try {
-            $catalog = $Json | ConvertFrom-Json -NoEnumerate -ErrorAction Stop
+            # -NoEnumerate only exists on PowerShell 6+; Windows PowerShell 5.1 already keeps a
+            # top-level JSON array as one object, so the option is added when the host has it.
+            $noEnumerate = @{}
+            if ((Get-Command ConvertFrom-Json).Parameters.ContainsKey('NoEnumerate')) {
+                $noEnumerate.NoEnumerate = $true
+            }
+            $catalog = $Json | ConvertFrom-Json @noEnumerate -ErrorAction Stop
         } catch {
             return "WinOneShot cannot parse ${Name}: $_"
         }

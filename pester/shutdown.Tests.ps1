@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - Closing while something is running
 
 BeforeAll {
@@ -166,7 +166,7 @@ Describe "The close question" {
         Invoke-WinUtilCloseRequest -RunningJob "Install"
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Button -eq "YesNoCancel" -and $Message -like "*Install*" -and $Message -like "*console*"
+            $Button -eq "YesNoCancel" -and $Message -like "*Install*" -and $Message -like "*控制台*"
         }
     }
 }

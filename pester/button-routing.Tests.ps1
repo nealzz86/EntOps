@@ -19,6 +19,12 @@ BeforeAll {
         param($ErrorRecord, $Component, $Context)
     }
     function Invoke-WPFFeatureInstall { }
+    function Invoke-WPFPresets {
+        param($preset, $imported, $checkboxfilterpattern)
+    }
+    function Invoke-WPFUltimatePerformance {
+        param([switch]$Enable)
+    }
 }
 
 Describe "Work button preflight" {
@@ -30,6 +36,13 @@ Describe "Work button preflight" {
                     WPFFeatureInstall = [pscustomobject]@{
                         Content = "Install Features"
                         function = "Invoke-WPFFeatureInstall"
+                    }
+                }
+                routes = @{
+                    WPFUpdatesdisable = [pscustomobject]@{
+                        function = "Invoke-WPFUpdatesdisable"
+                        work = $true
+                        confirm = "Confirm-WPFUpdatesdisable"
                     }
                 }
             }
@@ -77,7 +90,7 @@ Describe "Work button preflight" {
         Invoke-WPFButton -Button "WPFUpdatesdisable"
 
         Should -Invoke Start-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Name -eq "Disable Updates" -and $Parameters.UpdatesDisableConfirmed -eq $true
+            $Name -eq "Disable Updates" -and $Parameters.Confirmed -eq $true
         }
 
         $jobParameters = $script:capturedJob.Parameters
@@ -85,5 +98,77 @@ Describe "Work button preflight" {
 
         Should -Invoke Invoke-WPFUpdatesdisable -Times 1 -Exactly -ParameterFilter { $Confirmed }
         Should -Invoke Confirm-WPFUpdatesdisable -Times 1 -Exactly
+    }
+}
+
+Describe "Declared route dispatch" {
+    BeforeEach {
+        $script:sync = [Hashtable]::Synchronized(@{
+            ActiveJob = $null
+            configs = @{
+                feature = @{}
+                routes = @{}
+            }
+        })
+        $script:jobCount = 0
+
+        Mock Step-WinUtilJob { }
+        Mock Write-WinUtilLog { }
+        Mock Write-WinUtilErrorRecord { }
+        Mock Start-WinUtilJob { $script:jobCount++ }
+    }
+
+    AfterEach {
+        Remove-Variable -Name sync -Scope Script -ErrorAction SilentlyContinue
+        Remove-Variable -Name jobCount -Scope Script -ErrorAction SilentlyContinue
+    }
+
+    It "calls the handler with the arguments the route declares" {
+        $script:sync.configs.routes["WPFStandard"] = [pscustomobject]@{
+            function = "Invoke-WPFPresets"
+            arguments = [pscustomobject]@{ preset = "Standard"; checkboxfilterpattern = "WPFTweak*" }
+        }
+        Mock Invoke-WPFPresets { }
+
+        Invoke-WPFButton -Button "WPFStandard"
+
+        Should -Invoke Invoke-WPFPresets -Times 1 -Exactly -ParameterFilter {
+            $preset -eq "Standard" -and $checkboxfilterpattern -eq "WPFTweak*"
+        }
+        # A button that only repaints the interface must not queue a job
+        $script:jobCount | Should -Be 0
+    }
+
+    It "queues a job for a route that changes the system" {
+        $script:sync.configs.routes["WPFRemoveUltPerf"] = [pscustomobject]@{
+            function = "Invoke-WPFUltimatePerformance"
+            work = $true
+        }
+        $script:sync.WPFRemoveUltPerf = [pscustomobject]@{ Content = "Remove Ultimate Performance" }
+        Mock Invoke-WPFUltimatePerformance { }
+
+        Invoke-WPFButton -Button "WPFRemoveUltPerf"
+
+        $script:jobCount | Should -Be 1
+    }
+
+    It "warns rather than saying nothing when a button has no route" {
+        # This is the failure a new button produces: it is wired to the dispatcher like every other,
+        # matches nothing, and the click is silent.
+        Invoke-WPFButton -Button "WPFStrayButton"
+
+        Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
+            $Level -eq "WARN" -and $Component -eq "UI" -and $Message -like "*WPFStrayButton*"
+        }
+    }
+
+    It "warns when a route names a handler that is not there" {
+        $script:sync.configs.routes["WPFBroken"] = [pscustomobject]@{ function = "Invoke-WPFNotDefined" }
+
+        Invoke-WPFButton -Button "WPFBroken"
+
+        Should -Invoke Write-WinUtilLog -Times 1 -Exactly -ParameterFilter {
+            $Level -eq "WARN" -and $Message -like "*Invoke-WPFNotDefined*"
+        }
     }
 }

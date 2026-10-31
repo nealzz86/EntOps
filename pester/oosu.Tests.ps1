@@ -111,10 +111,10 @@ Describe "Invoke-WPFOOSU" {
         & $script:capturedJob.ScriptBlock @jobParameters
 
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Downloading O&O ShutUp10++ (35%)" -and $Percent -eq 35
+            $Status -eq "正在下载 O&O ShutUp10++（35%）" -and $Percent -eq 35
         }
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Launching O&O ShutUp10++" -and $Percent -eq 100
+            $Status -eq "正在启动 O&O ShutUp10++" -and $Percent -eq 100
         }
         Should -Invoke Start-Process -Times 1 -Exactly -ParameterFilter {
             $FilePath -eq (Join-Path $TestDrive "ooshutup10.exe")
@@ -131,13 +131,14 @@ Describe "Invoke-WPFOOSU" {
         & $script:capturedJob.ScriptBlock @jobParameters
 
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Downloading O&O ShutUp10++ (35% of 82 MB)" -and $Percent -eq 35
+            $Status -eq "正在下载 O&O ShutUp10++（35% / 82 MB）" -and $Percent -eq 35
         }
     }
 
     It "falls back to the plain percentage when the server sends no size" {
         Mock Save-WinUtilFile {
-            & $ProgressCallback 100 -1
+            # (-1) keeps the int type the real callback receives when Content-Length is missing
+            & $ProgressCallback 100 (-1)
         }
 
         Invoke-WPFOOSU
@@ -145,7 +146,7 @@ Describe "Invoke-WPFOOSU" {
         & $script:capturedJob.ScriptBlock @jobParameters
 
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Downloading O&O ShutUp10++ (100%)" -and $Percent -eq 100
+            $Status -eq "正在下载 O&O ShutUp10++（100%）" -and $Percent -eq 100
         }
     }
 
@@ -164,7 +165,7 @@ Describe "O&O ShutUp10++ button" {
     It "tells the user it downloads the tool before anything starts" {
         $tweaks = Get-Content (Join-Path $script:repoRoot "config\tweaks.json") -Raw | ConvertFrom-Json
 
-        $tweaks.WPFOOSUbutton.Description | Should -Match "(?i)download"
+        $tweaks.WPFOOSUbutton.Description | Should -Match "下载"
         $tweaks.WPFOOSUbutton.Description | Should -Match "MB"
     }
 

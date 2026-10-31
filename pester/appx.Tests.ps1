@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - AppX Management
 #===========================================================================
 
@@ -246,6 +246,9 @@ Describe "Get installed AppX selection" {
             ActiveJob = $null
             configs = @{
                 feature = @{}
+                # Read from the shipped file: which of these buttons becomes a job is a config
+                # decision, and a fake route here would test a product that does not exist
+                routes = (Get-Content -Path (Join-Path $script:repoRoot "config\routes.json") -Raw | ConvertFrom-Json)
                 appxHashtable = @{
                     WPFAppxExample = [pscustomobject]@{ PackageId = "Example.Package" }
                     WPFAppxMissing = [pscustomobject]@{ PackageId = "Missing.Package" }
@@ -420,8 +423,8 @@ Describe "Invoke-WPFAppxInstall" {
         Invoke-WPFAppxInstall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "No AppX Package selected" -and
-                $Title -eq "Error" -and
+            $Message -eq "未选择 AppX 软件包" -and
+                $Title -eq "错误" -and
                 $Button -eq "OK" -and
                 $Icon -eq "Error"
         }
@@ -450,10 +453,10 @@ Describe "Invoke-WPFAppxInstall" {
             $Name -eq "Example.Package" -and $StoreId -eq "9EXAMPLE1234"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Installing Example App (1/1)" -and $Percent -eq 0
+            $Status -eq "正在安装 Example App（1/1）" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Installed Example App (1/1)" -and $Percent -eq 100
+            $Status -eq "已安装 Example App（1/1）" -and $Percent -eq 100
         }
     }
 
@@ -529,7 +532,7 @@ Describe "Invoke-WPFAppxInstall" {
             $Action -eq "Install" -and $Results.Count -eq 1 -and $Results[0].Outcome -eq "Skipped"
         }
         Should -Invoke Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Skipped Example App (1/1)" -and $Percent -eq 100
+            $Status -eq "已跳过 Example App（1/1）" -and $Percent -eq 100
         }
     }
 
@@ -602,8 +605,8 @@ Describe "Invoke-WPFAppxRemoval" {
         Invoke-WPFAppxRemoval
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "No AppX Package selected" -and
-                $Title -eq "Error" -and
+            $Message -eq "未选择 AppX 软件包" -and
+                $Title -eq "错误" -and
                 $Button -eq "OK" -and
                 $Icon -eq "Error"
         }
@@ -644,13 +647,13 @@ Describe "Invoke-WPFAppxRemoval" {
             $PackageList.Count -eq 1 -and $PackageList[0] -eq "Example.Package"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Removing Example App (1/1)" -and $Percent -eq 0
+            $Status -eq "正在移除 Example App（1/1）" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Removed Example App (1/1)" -and $Percent -eq 90
+            $Status -eq "已移除 Example App（1/1）" -and $Percent -eq 90
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Removing provisioned AppX packages" -and $Percent -eq 90
+            $Status -eq "正在移除预配的 AppX 包" -and $Percent -eq 90
         }
     }
 

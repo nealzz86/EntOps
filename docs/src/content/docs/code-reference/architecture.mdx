@@ -456,6 +456,12 @@ restoring the interface in a `finally` whatever happens.
 job; anything that only changes what the interface is showing runs on the interface thread.
 That single classification is why no workflow arranges its own progress, banner or busy state.
 
+What a button does, and whether it is a long action, is declared per button in
+`config\routes.json` (`function`, `arguments`, `work`, `confirm`), so adding a button is a config
+entry rather than a new branch. The wildcard families, the window chrome and the few controls whose
+action is a statement stay in `Invoke-WPFButtonAction`, which logs a warning naming any button that
+matches nothing — a silent, unwired button is otherwise indistinguishable from an idle one.
+
 ```powershell
 Start-WinUtilJob -Name "Features" -Description "Installing Windows Features" -Parameters @{
     Features = @($sync.selectedFeatures)
@@ -715,6 +721,18 @@ Outputs `winutil.ps1` in the root directory.
 - Public functions: `Invoke-WPF*.ps1` or `Invoke-Winutil*.ps1`
 - Private functions: `Get-WinUtil*.ps1` or verb-WinUtil*.ps1`
 - Must include "WPF" or "Winutil" to load
+
+**Interface Text**:
+- Anything the window paints is Chinese: `Step-WinUtilJob -Status`, `Start-WinUtilJob -Description`,
+  `Show-WinUtilMessage -Message/-Title`, `MessageBox::Show`, and the 镜像制作 status log written
+  through `Write-WinUtilISOLog` / `& $Logger`. `pester\localization.Tests.ps1` reads these call
+  sites out of the AST and fails on an English-only literal, so the requirement is enforced rather
+  than remembered.
+- What the log is grepped for stays English: job names (`Start-WinUtilJob -Name`), log components
+  (`Write-WinUtilLog -Component`) and session-log `-Message` text. Translating those breaks the log
+  reading rules used when diagnosing a run, and the guard deliberately does not cover them.
+- Enum arguments (`-Button "YesNo"`, `-Icon "Warning"`, `-State "Indeterminate"`, `-Level "WARN"`)
+  and product names are not text to translate.
 
 ## Future Architecture Plans
 

@@ -24,7 +24,7 @@ function Invoke-WPFDiskAnaScan {
         try {
             Start-WinUtilDiskAnaScan -Root $Root
         } catch {
-            Append-WinUtilDiskLog -Message "磁盘分析失败：$($_.Exception.Message)" -Level "ERROR"
+            Write-WinUtilDiskLog -Message "磁盘分析失败：$($_.Exception.Message)" -Level "ERROR"
         }
     }
 }

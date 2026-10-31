@@ -32,5 +32,5 @@ function Get-WinUtilRegistryComboState {
         }
     }
 
-    throw "Registry values do not match a supported state."
+    throw "当前注册表值不匹配任何受支持的状态。"
 }

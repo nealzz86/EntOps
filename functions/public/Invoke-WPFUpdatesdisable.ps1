@@ -16,7 +16,7 @@ function Invoke-WPFUpdatesdisable {
 
     Write-WinUtilLog -Component "Updates" -Message "Disabling Windows Update settings."
 
-    Write-Host "Configuring registry settings..." -ForegroundColor Yellow
+    Write-Host "正在写入注册表配置..." -ForegroundColor Yellow
     Write-WinUtilLog -Component "Updates" -Message "Configuring Windows Update registry policy values for disable mode."
     # New-Item -Force on an existing registry key deletes the key and its subkeys first, so only
     # create missing keys and keep any other policies already stored under them.
@@ -33,17 +33,17 @@ function Invoke-WPFUpdatesdisable {
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -Type DWord -Value 0
 
     foreach ($serviceName in @("BITS", "wuauserv", "UsoSvc")) {
-        Write-Host "Stopping and disabling $serviceName service."
+        Write-Host "正在停止并禁用 $serviceName 服务。"
         Write-WinUtilLog -Component "Updates" -Message "Stopping and disabling $serviceName service."
         Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
         Set-Service -Name $serviceName -StartupType Disabled
     }
 
     Remove-Item -Path "C:\Windows\SoftwareDistribution\*" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "Cleared SoftwareDistribution folder."
+    Write-Host "已清空 SoftwareDistribution 目录。"
     Write-WinUtilLog -Component "Updates" -Message "Cleared SoftwareDistribution folder."
 
-    Write-Host "Disabling update related scheduled tasks..." -ForegroundColor Yellow
+    Write-Host "正在禁用更新相关的计划任务..." -ForegroundColor Yellow
     Write-WinUtilLog -Component "Updates" -Message "Disabling update related scheduled tasks."
 
     $Tasks =
@@ -59,7 +59,7 @@ function Invoke-WPFUpdatesdisable {
     }
 
 
-    Write-Host "Note: You must restart your system in order for all changes to take effect." -ForegroundColor Yellow
+    Write-Host "提示：必须重启计算机，以上更改才会全部生效。" -ForegroundColor Yellow
     Write-WinUtilLog -Component "Updates" -Message "Windows Update disable workflow completed. Restart required."
 }
 

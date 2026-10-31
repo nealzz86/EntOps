@@ -226,7 +226,7 @@ Describe "Complete-WinUtilPackageRun" {
             $caught = $_
         }
 
-        $caught.Exception.Message | Should -BeLike "1 of 2 package(s) failed: b. *"
+        $caught.Exception.Message | Should -BeLike "1/2 个包失败：b。*"
         $caught.Exception.Data["WinUtilErrorReported"] | Should -BeTrue
     }
 

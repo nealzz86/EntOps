@@ -35,13 +35,13 @@ function Show-WinUtilNetToolResult {
     if (-not $Result) { return }
 
     if ($Result.Problem) {
-        Append-WinUtilNetLog -Message "$($Label)：$($Result.Problem)" -Level "WARN"
+        Write-WinUtilNetLog -Message "$($Label)：$($Result.Problem)" -Level "WARN"
         Show-WinUtilNetResults -Rows @() -EmptyText "$($Label)未执行 —— $($Result.Problem)"
         return
     }
 
     foreach ($note in @($Result.Notes)) {
-        Append-WinUtilNetLog -Message "$($Label)：$note"
+        Write-WinUtilNetLog -Message "$($Label)：$note"
     }
     Show-WinUtilNetResults -Rows $Result.Rows -EmptyText "$($Label)：无结果。"
 }
@@ -118,7 +118,7 @@ function Invoke-WPFNetToolConflict {
 
         $result = Get-WinUtilNetIpConflict -Text $Text -OnProgress {
             param($Message)
-            Append-WinUtilNetLog -Message $Message
+            Write-WinUtilNetLog -Message $Message
         }
         Show-WinUtilNetToolResult -Label "IP 冲突检测" -Result $result
     }

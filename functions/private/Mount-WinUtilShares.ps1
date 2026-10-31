@@ -53,7 +53,7 @@ function Invoke-WinUtilEntCmd {
     }
 }
 
-function Map-WinUtilShares {
+function Mount-WinUtilShares {
 
     <#
 
@@ -121,7 +121,7 @@ function Map-WinUtilShares {
     Write-WinUtilEntNativeLog
 }
 
-function Print-WinUtilTestPage {
+function Send-WinUtilTestPage {
 
     <#
 

@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - Package Selection and Package Managers
 #===========================================================================
 
@@ -240,7 +240,7 @@ Describe "Install-WinUtilProgramChoco" {
     It "moves the progress bar through the list" {
         Install-WinUtilProgramChoco -Action Install -Programs @("git", "vlc") -ProgressBase 0 -ProgressSpan 100
 
-        Should -Invoke -CommandName Step-WinUtilJob -ParameterFilter { $Status -like "*git (1/2)*" }
-        Should -Invoke -CommandName Step-WinUtilJob -ParameterFilter { $Status -like "*vlc (2/2)*" }
+        Should -Invoke -CommandName Step-WinUtilJob -ParameterFilter { $Status -like "*git（1/2）*" }
+        Should -Invoke -CommandName Step-WinUtilJob -ParameterFilter { $Status -like "*vlc（2/2）*" }
     }
 }

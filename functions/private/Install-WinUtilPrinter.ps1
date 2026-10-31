@@ -250,7 +250,7 @@ function Install-WinUtilPrinter {
     }
     if ($TestPage) {
         Write-Host "  正在打印测试页…"
-        Print-WinUtilTestPage -PrinterName $Printer.Name -Printer $Printer | Out-Null
+        Send-WinUtilTestPage -PrinterName $Printer.Name -Printer $Printer | Out-Null
     }
 
     Step-WinUtilJob -Status "安装完成" -Percent 100

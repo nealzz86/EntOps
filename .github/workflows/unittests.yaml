@@ -32,6 +32,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v7
 
+    - name: Scan the tracked tree for field credentials
+      run: |
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+        & ./lint/SecretScan.ps1
+        if ($LASTEXITCODE -ne 0) {
+            throw "凭据扫描未通过：现场账号、驱动包或编译产物不得进入仓库。"
+        }
+      shell: pwsh
+
     - name: Install Pester
       run: |
         Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process

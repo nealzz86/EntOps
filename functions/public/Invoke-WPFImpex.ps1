@@ -54,8 +54,8 @@ function Invoke-WPFImpex {
                     $allConfs = ($sync.selectedApps + $sync.selectedTweaks + $sync.selectedToggles + $sync.selectedFeatures + $sync.selectedAppx) | ForEach-Object { [string]$_ }
                     if (-not $allConfs) {
                         Show-WinUtilMessage -Message (
-                            "No settings are selected to export. Please select at least one app, tweak, toggle, feature, or AppX package before exporting."
-                        ) -Title "Nothing to Export" -Button "OK" -Icon "Warning" | Out-Null
+                            "未选择任何要导出的设置。请先勾选至少一个应用、优化、开关、功能或 AppX 软件包，再执行导出。"
+                        ) -Title "无可导出的设置" -Button "OK" -Icon "Warning" | Out-Null
                         return
                     }
                     $jsonFile = $allConfs | ConvertTo-Json
@@ -140,7 +140,7 @@ function Invoke-WPFImpex {
                         if ($skippedSelections.Count -gt 0) {
                             $skippedDisplay = @($skippedSelections | Select-Object -First 10) -join ", "
                             if ($skippedSelections.Count -gt 10) {
-                                $skippedDisplay += "`n...and $($skippedSelections.Count - 10) more. See the WinUtil log for details."
+                                $skippedDisplay += "`n……另有 $($skippedSelections.Count - 10) 项已跳过，详见 WinUtil 日志。"
                             }
                             if ($sync.Form) {
                                 Show-WinUtilMessage -Message "已导入受支持的设置。以下已弃用的设置被跳过：`n`n$skippedDisplay" -Title "旧版配置部分导入" -Icon "Warning" | Out-Null

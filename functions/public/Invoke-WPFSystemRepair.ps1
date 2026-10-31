@@ -53,7 +53,7 @@ function Invoke-WPFSystemRepair {
                 # job result, so accepted nonzero outcomes cannot finish with a green checkmark.
                 Write-Warning "$($step.Label) finished: $($step.SuccessCodes[$exitCode])."
             } else {
-                throw "$($step.Label) failed with exit code $exitCode."
+                throw "「$($step.Label)」执行失败，退出码 $exitCode。"
             }
         }
 

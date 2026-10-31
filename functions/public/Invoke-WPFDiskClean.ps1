@@ -10,7 +10,7 @@ function Invoke-WPFDiskScan {
 
     Start-WinUtilJob -Name "磁盘扫描" -Description "正在扫描垃圾文件占用" -ScriptBlock {
         $defs = Get-WinUtilDiskJunkDefs
-        Append-WinUtilDiskLog -Message "开始扫描 $($defs.Count) 类垃圾文件……"
+        Write-WinUtilDiskLog -Message "开始扫描 $($defs.Count) 类垃圾文件……"
 
         $grand = [long]0
         $index = 0
@@ -26,10 +26,10 @@ function Invoke-WPFDiskScan {
                 $label = $sync["WPFDiskSize$Id"]
                 if ($null -ne $label) { $label.Text = $Size }
             }
-            Append-WinUtilDiskLog -Message "$($def.Name)：$(Format-WinUtilJunkSize $bytes)"
+            Write-WinUtilDiskLog -Message "$($def.Name)：$(Format-WinUtilJunkSize $bytes)"
         }
 
-        Append-WinUtilDiskLog -Message "扫描完成，合计可清理约 $(Format-WinUtilJunkSize $grand)。勾选项目后点击「清理勾选项」。"
+        Write-WinUtilDiskLog -Message "扫描完成，合计可清理约 $(Format-WinUtilJunkSize $grand)。勾选项目后点击「清理勾选项」。"
     }
 }
 
@@ -63,7 +63,7 @@ function Invoke-WPFDiskClean {
     }
 
     if ($selectedIds.Count -eq 0) {
-        Append-WinUtilDiskLog -Message "请先勾选至少一个要清理的项目（可先点「扫描垃圾占用」查看大小）。" -Level "WARN"
+        Write-WinUtilDiskLog -Message "请先勾选至少一个要清理的项目（可先点「扫描垃圾占用」查看大小）。" -Level "WARN"
         return
     }
 
@@ -90,7 +90,7 @@ $($selectedNames -join "、")
         foreach ($def in $wanted) {
             $index++
             Step-WinUtilJob -Status "正在清理 $($def.Name)" -Percent (10 + [int](85 * $index / $wanted.Count))
-            Append-WinUtilDiskLog -Message "正在清理 $($def.Name) ……"
+            Write-WinUtilDiskLog -Message "正在清理 $($def.Name) ……"
             try {
                 $freed = Clear-WinUtilDiskJunkDef -Def $def
                 $grand += $freed
@@ -99,11 +99,11 @@ $($selectedNames -join "、")
                     $label = $sync["WPFDiskSize$Id"]
                     if ($null -ne $label) { $label.Text = "已清理" }
                 }
-                Append-WinUtilDiskLog -Message "$($def.Name)：释放 $(Format-WinUtilJunkSize $freed)"
+                Write-WinUtilDiskLog -Message "$($def.Name)：释放 $(Format-WinUtilJunkSize $freed)"
             } catch {
-                Append-WinUtilDiskLog -Message "$($def.Name)：清理失败 $($_.Exception.Message)" -Level "ERROR"
+                Write-WinUtilDiskLog -Message "$($def.Name)：清理失败 $($_.Exception.Message)" -Level "ERROR"
             }
         }
-        Append-WinUtilDiskLog -Message "✅ 清理完成，共释放约 $(Format-WinUtilJunkSize $grand)。"
+        Write-WinUtilDiskLog -Message "✅ 清理完成，共释放约 $(Format-WinUtilJunkSize $grand)。"
     }
 }

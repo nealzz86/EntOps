@@ -63,7 +63,7 @@ function Invoke-WPFShareMapOnly {
     Start-WinUtilJob -Name "共享映射" -Parameters @{ Indices = $shareIndices } -ScriptBlock {
         param($Indices)
         Write-Host "========== 共享文件夹映射 =========="
-        Map-WinUtilShares -Indices $Indices
+        Mount-WinUtilShares -Indices $Indices
         Write-Host "✅ 共享文件夹映射完成，可在「此电脑」中查看新增的网络驱动器。"
     }
 }

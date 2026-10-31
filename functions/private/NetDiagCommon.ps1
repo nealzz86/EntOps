@@ -129,7 +129,7 @@ function Format-WinUtilNetBitRate {
     return ("{0:N0} bps" -f $bits)
 }
 
-function Append-WinUtilNetLog {
+function Write-WinUtilNetLog {
 
     <#
 

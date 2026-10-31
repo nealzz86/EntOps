@@ -44,7 +44,12 @@ public static class WinUtilRunspaceCleanup
 
         $startSource | Should -Match '\$sync\.AssetRenderLock = \[object\]::new\(\)'
         $startSource | Should -Match '\$sync\.RenderedAssetCache = \[Hashtable\]::Synchronized'
-        $initializerSource | Should -Match '\[System\.Threading\.Monitor\]::Enter\(\$assetRenderLock\)'
+        # Both callers - the speculative background thread and the fallback on the interface
+        # thread - go through this one function, and it reads the lock object from shared state.
+        $initializerSource | Should -Match '\$assetRenderLock = \$sync\.AssetRenderLock'
+        # The interface thread asks once and walks away: an unbounded wait here would turn a
+        # render that never finishes into the same frozen window this whole path exists to avoid.
+        $initializerSource | Should -Match '\[System\.Threading\.Monitor\]::TryEnter\(\$assetRenderLock, 0\)'
         $initializerSource | Should -Match '\[System\.Threading\.Monitor\]::Exit\(\$assetRenderLock\)'
     }
 

@@ -18,7 +18,7 @@ function Test-WinUtilIPv4 {
     return $true
 }
 
-function Append-WinUtilReceiptLog {
+function Write-WinUtilReceiptLog {
 
     <#
 

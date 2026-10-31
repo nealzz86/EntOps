@@ -230,7 +230,7 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
             $elevationCommand = New-WinUtilElevationCommand -ScriptPath $PSCommandPath -Parameters $elevationParameters -Headless
             $elevated = Start-Process $powershellCmd -ArgumentList @("-ExecutionPolicy", "Bypass", "-NoProfile", "-EncodedCommand", $elevationCommand) -Verb RunAs -Wait -PassThru -ErrorAction Stop
         } catch {
-            Write-Host "Elevation was declined or failed: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "提权被拒绝或失败：$($_.Exception.Message)" -ForegroundColor Red
             $global:LASTEXITCODE = 1
             if ($script:WinUtilIsFileProcess) { exit 1 }
             return 1

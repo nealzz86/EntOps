@@ -378,7 +378,7 @@ function Invoke-WPFUIElements {
                                     } catch {
                                         $applyError = $_.Exception.Message
                                         if ([string]::IsNullOrWhiteSpace($applyError)) {
-                                            $applyError = "Unable to apply registry state '$($selectedItem.Content)'."
+                                            $applyError = "无法应用注册表状态「$($selectedItem.Content)」。"
                                         }
                                         $previousState = if ($this.Tag.State) { $this.Tag.State } else { "自定义 / 未知 - 请选择状态" }
                                         $this.SelectedItem = @($this.Items) | Where-Object Content -EQ $previousState | Select-Object -First 1

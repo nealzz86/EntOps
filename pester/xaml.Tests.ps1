@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - XAML Control Wiring
 
 BeforeAll {
@@ -84,11 +84,33 @@ BeforeAll {
         $names | Sort-Object -Unique
     }
 
-    function script:Get-WinUtilButtonSwitchNames {
+    # Branch labels of the Switch -Wildcard dispatch in Invoke-WPFButton.ps1. A label may carry
+    # wildcards ("WPFTab??BT", "WPFFNetTool*"), so literal names and patterns are split apart:
+    # a button is routed when a literal branch names it or a wildcard branch matches it.
+    function script:Get-WinUtilButtonSwitchBranchLabels {
         $buttonSource = Get-Content -Path $script:buttonScriptPath -Raw
-        [regex]::Matches($buttonSource, '"(WPF[A-Za-z0-9_]+)"\s*\{') |
+        $switchIndex = $buttonSource.IndexOf("Switch -Wildcard")
+        if ($switchIndex -lt 0) {
+            throw "Invoke-WPFButton.ps1 no longer routes buttons through a Switch -Wildcard block"
+        }
+
+        [regex]::Matches($buttonSource.Substring($switchIndex), '"(WPF[A-Za-z0-9_*?]*)"\s*\{') |
             ForEach-Object { $_.Groups[1].Value } |
             Sort-Object -Unique
+    }
+
+    function script:Get-WinUtilButtonSwitchNames {
+        @(Get-WinUtilButtonSwitchBranchLabels | Where-Object { $_ -notmatch '[*?]' })
+    }
+
+    function script:Get-WinUtilButtonSwitchPatterns {
+        @(Get-WinUtilButtonSwitchBranchLabels | Where-Object { $_ -match '[*?]' })
+    }
+
+    # Most buttons no longer have a branch of their own: config\routes.json says what they call.
+    function script:Get-WinUtilButtonRouteNames {
+        $routes = Get-WinUtilConfigObject -Name "routes"
+        @($routes.PSObject.Properties.Name)
     }
 
     function script:Test-WinUtilNameInSet {
@@ -118,6 +140,9 @@ Describe "Interface startup failures" {
 
     BeforeEach {
         . $script:uiScriptPath
+        # The startup path decides the render mode before it parses any XAML, so the file that
+        # defines it has to be loaded here or the function-not-found error hides the real one.
+        . (Join-Path $script:functionRoot "private\Set-WinUtilRenderMode.ps1")
         $script:sync = [Hashtable]::Synchronized(@{
             StepTimings = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
             preferences = @{ theme = "Auto" }
@@ -171,17 +196,18 @@ Describe "XAML document" {
             "SearchBarIcon",
             "SearchBarClearButton",
             "WPFSearchChips",
+            # The category chips the fork ships: every one of these is wired from
+            # $sync.AppCategoryChips in Start-WinUtilUserInterface.ps1, so a rename breaks filtering
             "WPFSearchChipAll",
-            "WPFSearchChipBrowsers",
-            "WPFSearchChipCommunications",
-            "WPFSearchChipDevelopment",
-            "WPFSearchChipDocument",
-            "WPFSearchChipGames",
-            "WPFSearchChipMicrosoftTools",
-            "WPFSearchChipMultimediaTools",
-            "WPFSearchChipProTools",
-            "WPFSearchChipSelfhostedTools",
+            "WPFSearchChipComms",
+            "WPFSearchChipOffice",
             "WPFSearchChipUtilities",
+            "WPFSearchChipInput",
+            "WPFSearchChipNetwork",
+            "WPFSearchChipMedia",
+            "WPFSearchChipRemote",
+            "WPFSearchChipDev",
+            "WPFSearchChipPos",
             "appscategory",
             "appspanel",
             "tweakspanel",
@@ -219,9 +245,9 @@ Describe "XAML document" {
         $updatesTab = $script:xaml.SelectSingleNode('//*[local-name()="TabItem"][@Name="WPFTab4"]')
         $profileGrid = $updatesTab.SelectSingleNode('.//*[local-name()="UniformGrid"]')
         $expectedButtons = @{
-            WPFUpdatessecurity = "Apply Recommended"
-            WPFUpdatesdefault = "Restore Defaults"
-            WPFUpdatesdisable = "Disable Updates"
+            WPFUpdatessecurity = "应用推荐设置"
+            WPFUpdatesdefault = "恢复默认设置"
+            WPFUpdatesdisable = "禁用更新"
         }
 
         $profileGrid.GetAttribute("Columns") | Should -Be "3"
@@ -294,12 +320,17 @@ Describe "XAML document" {
         $tabItems = @($script:xaml.SelectNodes('//*[local-name()="TabControl"][@Name="WPFTabNav"]/*[local-name()="TabItem"]'))
         $actualTabs = @($tabItems | ForEach-Object { "$($_.GetAttribute("Name")):$($_.GetAttribute("Header"))" })
         $expectedTabs = @(
-            "WPFTab1:Install",
-            "WPFTab2:Tweaks",
-            "WPFTab3:Config",
-            "WPFTab4:Updates",
-            "WPFTab5:Win11ISO",
-            "WPFTab6:AppX"
+            "WPFTab1:安装",
+            "WPFTab2:优化",
+            "WPFTab3:配置",
+            "WPFTab4:更新",
+            "WPFTab5:Win11ISO（镜像制作）",
+            "WPFTab6:AppX",
+            "WPFTab7:打印共享",
+            "WPFTab8:安全清理",
+            "WPFTab9:概览",
+            "WPFTab10:磁盘分析",
+            "WPFTab11:网络诊断"
         )
 
         if (@($actualTabs).Count -ne $expectedTabs.Count) {
@@ -316,7 +347,13 @@ Describe "XAML document" {
 
 
     It "centers top bar controls vertically" {
-        $navPanel = $script:xaml.SelectSingleNode('//*[local-name()="StackPanel"][@Name="NavDockPanel"]')
+        # NavDockPanel is no longer part of the top bar: the console redesign moved it into the
+        # sidebar as a vertical nav rail. The top bar row now holds the page title, the search bar
+        # and the window action buttons, so those are the groups that must centre themselves.
+        $pageTitle = $script:xaml.SelectSingleNode('//*[local-name()="TextBlock"][@Name="WPFPageTitle"]')
+        $titlePanel = $pageTitle.ParentNode
+        $searchBox = $script:xaml.SelectSingleNode('//*[local-name()="TextBox"][@Name="SearchBar"]')
+        $searchBorder = $searchBox.ParentNode.ParentNode
         $minimizeButton = $script:xaml.SelectSingleNode('//*[local-name()="Button"][@Name="WPFMinimizeButton"]')
         $actionPanel = $minimizeButton.ParentNode
         $topBarButtonNames = @(
@@ -328,7 +365,18 @@ Describe "XAML document" {
             "WPFCloseButton"
         )
 
-        $navPanel.GetAttribute("VerticalAlignment") | Should -Be "Center"
+        $titlePanel.LocalName | Should -Be "StackPanel"
+        $searchBorder.LocalName | Should -Be "Border"
+        $actionPanel.LocalName | Should -Be "StackPanel"
+
+        # Pin what these groups are before pinning where they sit: the action row lays its six
+        # buttons out side by side and the title block stacks, and neither reads correctly unless
+        # the group itself is centred inside the bar
+        $titlePanel.GetAttribute("Orientation") | Should -Be "Vertical"
+        $actionPanel.GetAttribute("Orientation") | Should -Be "Horizontal"
+
+        $titlePanel.GetAttribute("VerticalAlignment") | Should -Be "Center"
+        $searchBorder.GetAttribute("VerticalAlignment") | Should -Be "Center"
         $actionPanel.GetAttribute("VerticalAlignment") | Should -Be "Center"
 
         foreach ($buttonName in $topBarButtonNames) {
@@ -345,20 +393,32 @@ Describe "XAML document" {
         $resources = $script:xaml.SelectSingleNode('//*[local-name()="Window.Resources"]')
         $implicitToggleStyles = @($resources.SelectNodes('./*[local-name()="Style"][@TargetType="ToggleButton" or @TargetType="{x:Type ToggleButton}"][not(@x:Key)]', $script:xamlNamespace))
         $tabStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@x:Key="TabToggleButton"]', $script:xamlNamespace)
+        $navToggleStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@x:Key="NavItemToggleStyle"]', $script:xamlNamespace)
+        $chipToggleStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@x:Key="FilterChipToggleStyle"]', $script:xamlNamespace)
         $comboToggleStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@x:Key="ComboBoxToggleButtonStyle"]', $script:xamlNamespace)
         $comboStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@TargetType="ComboBox"]')
         $comboToggle = $comboStyle.SelectSingleNode('.//*[local-name()="ToggleButton"][@Name="ToggleButton"]')
         $comboItemStyle = $resources.SelectSingleNode('./*[local-name()="Style"][@TargetType="ComboBoxItem"]')
         $navButtons = @($script:xaml.SelectNodes('//*[local-name()="StackPanel"][@Name="NavDockPanel"]/*[local-name()="ToggleButton"]'))
+        $chipButtons = @($script:xaml.SelectNodes('//*[local-name()="WrapPanel"][@Name="WPFSearchChips"]/*[local-name()="ToggleButton"]'))
 
         $implicitToggleStyles | Should -BeNullOrEmpty
         $tabStyle | Should -Not -BeNullOrEmpty
+        $navToggleStyle | Should -Not -BeNullOrEmpty
+        $chipToggleStyle | Should -Not -BeNullOrEmpty
         $comboToggleStyle | Should -Not -BeNullOrEmpty
+        # The combo box keeps its own keyed toggle style, so neither the nav rail nor the filter
+        # chips can restyle the dropdown button through an implicit lookup
         $comboToggle.GetAttribute("Style") | Should -Be "{StaticResource ComboBoxToggleButtonStyle}"
         $comboItemStyle | Should -Not -BeNullOrEmpty
-        $navButtons.Count | Should -Be 5
+        # Eleven pages, but AppX is reached from the removal button instead of the nav rail
+        $navButtons.Count | Should -Be 10
         foreach ($navButton in $navButtons) {
-            $navButton.GetAttribute("Style") | Should -Be "{StaticResource TabToggleButton}"
+            $navButton.GetAttribute("Style") | Should -Be "{StaticResource NavItemToggleStyle}"
+        }
+        $chipButtons.Count | Should -Be 10
+        foreach ($chipButton in $chipButtons) {
+            $chipButton.GetAttribute("Style") | Should -Be "{StaticResource FilterChipToggleStyle}"
         }
     }
 
@@ -440,6 +500,8 @@ Describe "XAML and sync wiring" {
             "transcriptPath",
             "ActiveJob",
             "ActiveJobToken",
+            # Job display name captured by Start-WinUtilJob.ps1 so the UI watchdog can report it
+            "ActiveJobLabel",
             "LastJobResult",
             # Intrinsic to the synchronized hashtable rather than WinUtil state; the job layer
             # locks on it to claim and release the active job slot
@@ -501,7 +563,45 @@ Describe "XAML and sync wiring" {
             "Win11ISOWorkDir",
             "Win11ISOContentsDir",
             "Win11ISOExistingWorkRetryPending",
-            "Win11ISOUSBDisks"
+            "Win11ISOProductFamily",
+            "Win11ISOUSBDisks",
+            # Disk analysis page state, owned by Initialize-WinUtilDiskAnaPanel.ps1 and the scan
+            "DiskAna",
+            # Set in scripts/start.ps1 when the script runs inside the packaged .exe host
+            "IsExeHost",
+            # Unpacked payload directory, published by scripts/main.ps1 for Get-WinUtilAppBaseDir.ps1
+            "PayloadDir",
+            # Offline flag mirrored into the runspace state by New-WinUtilSessionState.ps1
+            "PARAM_OFFLINE",
+            # Last job step timestamp/status, written by Step-WinUtilJob.ps1 and read by the watchdog
+            "LastStepAt",
+            "LastStepStatus",
+            # Software-render fallback flag, set by Set-WinUtilRenderMode.ps1 for Remote Desktop
+            "SoftwareRender",
+            # Interface watchdog bookkeeping, all owned by Register-WinUtilUiWatchdog.ps1
+            "UiWatchdogHandle",
+            "UiWatchdogRunspace",
+            "UiWatchdogShell",
+            "UiWatchdogStop",
+            "UiWatchdogStalled",
+            "UiFrameCounter",
+            "UiRenderFrames",
+            "UiLastPing",
+            "UiQuietTicks",
+            "UiOffScreen",
+            # Taskbar pin state, de-duplicated inside Set-WinUtilTaskbaritem.ps1
+            "TaskbarWritten",
+            "TaskbarUnusable",
+            # Network diagnostics page state: health summary and live host table
+            "NetDiagHealth",
+            "NetDiagLiveHosts",
+            # OUI vendor lookup cache and its source label, filled by NetDiagTools.ps1
+            "NetOuiTable",
+            "NetOuiSource",
+            # pktmon capture session, owned by PktmonCapture.ps1
+            "PktmonFile",
+            "PktmonRunning",
+            "PktmonStarted"
         )
         $allowedNames = @($xamlNames + $generatedNames + $dynamicStateNames) | Sort-Object -Unique
         $bracketReferences = @(
@@ -552,13 +652,17 @@ Describe "WPF handler wiring" {
             $runtimeControls |
                 Where-Object { $_.Name -like "WPF*" -and $_.Type -in @("Button", "ToggleButton") }
         )
-        $buttonSwitchNames = @(Get-WinUtilButtonSwitchNames)
+        $buttonSwitchNames = @((Get-WinUtilButtonSwitchNames) + (Get-WinUtilButtonRouteNames))
+        $buttonSwitchPatterns = @(Get-WinUtilButtonSwitchPatterns)
         $featureNames = @((Get-WinUtilConfigObject -Name "feature").PSObject.Properties.Name)
         $uiScript = Get-Content -Path $script:uiScriptPath -Raw
         $unhandledButtons = New-Object System.Collections.Generic.List[string]
 
         foreach ($button in $buttonControls) {
-            $hasSwitchHandler = (Test-WinUtilNameInSet -Name $button.Name -Set $buttonSwitchNames) -or $button.Name -like "WPFTab?BT"
+            # Tab buttons (WPFTab9BT ... WPFTab11BT) and the network tool rows are never named
+            # one by one; the dispatch reaches them through a wildcard branch instead.
+            $hasWildcardRoute = @($buttonSwitchPatterns | Where-Object { $button.Name -like $_ }).Count -gt 0
+            $hasSwitchHandler = (Test-WinUtilNameInSet -Name $button.Name -Set $buttonSwitchNames) -or $hasWildcardRoute
             $hasFeatureHandler = Test-WinUtilNameInSet -Name $button.Name -Set $featureNames
             $escapedName = [regex]::Escape($button.Name)
             $explicitHandlerPattern = '\$sync\s*(?:\[\s*["'']' + $escapedName + '["'']\s*\]|\.' + $escapedName + ')\.Add_Click'

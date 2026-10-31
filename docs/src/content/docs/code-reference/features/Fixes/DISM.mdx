@@ -26,7 +26,7 @@ function Invoke-WPFSystemRepair {
     # outcomes, while 1 from sfc is a failure, and 3010 is a repaired image from DISM only.
     $steps = @(
         @{
-            Label = "Checking the disk for errors"
+            Label = "正在检查磁盘错误"
             Arguments = "/c chkdsk /scan /perf"
             # 3 is left out: the disk could not be checked, or has errors an online scan cannot
             # fix, and the steps after this one are not worth running on a disk in that state.
@@ -36,12 +36,12 @@ function Invoke-WPFSystemRepair {
             }
         },
         @{
-            Label = "Scanning protected system files"
+            Label = "正在扫描受保护的系统文件"
             Arguments = "/c sfc /scannow"
             SuccessCodes = @{}
         },
         @{
-            Label = "Repairing the Windows image"
+            Label = "正在修复 Windows 镜像"
             Arguments = "/c dism /online /cleanup-image /restorehealth"
             SuccessCodes = @{
                 3010 = "a restart is needed for the repair to take effect"
@@ -51,7 +51,7 @@ function Invoke-WPFSystemRepair {
 
     $completed = 0
     foreach ($step in $steps) {
-        Step-WinUtilJob -Status "$($step.Label) ($($completed + 1)/$($steps.Count))" -Percent ([int](($completed / $steps.Count) * 100))
+        Step-WinUtilJob -Status "$($step.Label)（$($completed + 1)/$($steps.Count)）" -Percent ([int](($completed / $steps.Count) * 100))
         Write-WinUtilLog -Component "SystemRepair" -Message $step.Label
         # Start-Process does not throw on a nonzero exit, so without this a failed chkdsk, sfc
         # or dism run would still be reported as a completed repair
@@ -64,7 +64,7 @@ function Invoke-WPFSystemRepair {
                 # job result, so accepted nonzero outcomes cannot finish with a green checkmark.
                 Write-Warning "$($step.Label) finished: $($step.SuccessCodes[$exitCode])."
             } else {
-                throw "$($step.Label) failed with exit code $exitCode."
+                throw "「$($step.Label)」执行失败，退出码 $exitCode。"
             }
         }
 

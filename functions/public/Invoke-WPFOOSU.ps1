@@ -1,5 +1,5 @@
 function Invoke-WPFOOSU {
-    Start-WinUtilJob -Name "OOSU" -Description "Downloading O&O ShutUp10++" -Parameters @{
+    Start-WinUtilJob -Name "OOSU" -Description "正在下载 O&O ShutUp10++" -Parameters @{
         DownloadPath = Join-Path $sync.winutildir "ooshutup10.exe"
     } -ScriptBlock {
         param($DownloadPath)
@@ -11,14 +11,14 @@ function Invoke-WPFOOSU {
 
             # The server may omit Content-Length, in which case only the percentage is known
             $progress = if ($totalBytes -gt 0) {
-                "$percent% of $([math]::Round($totalBytes / 1MB)) MB"
+                "$percent% / $([math]::Round($totalBytes / 1MB)) MB"
             } else {
                 "$percent%"
             }
-            Step-WinUtilJob -Status "Downloading O&O ShutUp10++ ($progress)" -Percent $percent
+            Step-WinUtilJob -Status "正在下载 O&O ShutUp10++（$progress）" -Percent $percent
         }
 
-        Step-WinUtilJob -Status "Launching O&O ShutUp10++" -Percent 100
+        Step-WinUtilJob -Status "正在启动 O&O ShutUp10++" -Percent 100
         Start-Process -FilePath $DownloadPath
         Write-WinUtilLog -Component "OOSU" -Message "O&O ShutUp10++ launched."
     }

@@ -120,7 +120,7 @@ function Format-WinUtilJunkSize {
     return "$Bytes B"
 }
 
-function Append-WinUtilDiskLog {
+function Write-WinUtilDiskLog {
 
     <#
 

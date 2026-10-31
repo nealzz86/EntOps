@@ -2,6 +2,14 @@
     [switch]$Run
 )
 
+# Field credentials belong to config\<name>.local.json, which never enters the repository. Scanning
+# the tracked tree before compiling turns a credential mis-pasted into a template into a build
+# failure here rather than a public commit later.
+& (Join-Path -Path $PSScriptRoot -ChildPath "lint\SecretScan.ps1")
+if ($LASTEXITCODE -ne 0) {
+    throw "凭据扫描未通过，已停止编译。"
+}
+
 $OFS = "`r`n"
 
 # Site specific values (share accounts, printer addresses) live in config\<name>.local.json, which

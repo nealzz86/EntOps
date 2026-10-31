@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - Tweak Orchestration
 #===========================================================================
 
@@ -444,7 +444,7 @@ Describe "Invoke-WPFtweaksbutton" {
         Invoke-WPFtweaksbutton
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Please check the tweaks you wish to perform."
+            $Message -eq "请勾选要执行的优化。"
         }
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
@@ -476,10 +476,10 @@ Describe "Invoke-WPFtweaksbutton" {
         }
         Should -Invoke -CommandName Invoke-WinUtilTweaks -Times 2 -Exactly
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying Telemetry - Disable (1/2)" -and $Percent -eq 0
+            $Status -eq "正在应用 Telemetry - Disable（1/2）" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying Services - Set to Manual (2/2)" -and $Percent -eq 50
+            $Status -eq "正在应用 Services - Set to Manual（2/2）" -and $Percent -eq 50
         }
     }
 
@@ -518,10 +518,10 @@ Describe "Invoke-WPFtweaksbutton" {
 
         $script:appliedOrder | Should -Be @("WPFTweaksRestorePoint", "WPFTweaksTelemetry")
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Creating restore point" -and $Percent -eq 0
+            $Status -eq "正在创建还原点" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying Telemetry - Disable (2/2)" -and $Percent -eq 50
+            $Status -eq "正在应用 Telemetry - Disable（2/2）" -and $Percent -eq 50
         }
     }
 
@@ -534,7 +534,7 @@ Describe "Invoke-WPFtweaksbutton" {
         & $script:capturedTweaksJob.ScriptBlock @jobParameters
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Applying WPFTweaksTelemetry (1/1)" -and $Percent -eq 0
+            $Status -eq "正在应用 WPFTweaksTelemetry（1/1）" -and $Percent -eq 0
         }
     }
 }
@@ -575,7 +575,7 @@ Describe "Invoke-WPFundoall" {
         Invoke-WPFundoall
 
         Should -Invoke -CommandName Show-WinUtilMessage -Times 1 -Exactly -ParameterFilter {
-            $Message -eq "Please check the tweaks you wish to undo."
+            $Message -eq "请勾选要撤销的优化。"
         }
         Should -Invoke -CommandName Start-WinUtilJob -Times 0 -Exactly
     }
@@ -594,10 +594,10 @@ Describe "Invoke-WPFundoall" {
 
         Should -Invoke -CommandName Invoke-WinUtilTweaks -Times 2 -Exactly -ParameterFilter { $undo -eq $true }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Undoing Telemetry - Disable (1/2)" -and $Percent -eq 0
+            $Status -eq "正在撤销 Telemetry - Disable（1/2）" -and $Percent -eq 0
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Undoing Services - Set to Manual (2/2)" -and $Percent -eq 50
+            $Status -eq "正在撤销 Services - Set to Manual（2/2）" -and $Percent -eq 50
         }
     }
 }

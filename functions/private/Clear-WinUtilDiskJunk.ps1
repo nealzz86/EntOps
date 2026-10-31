@@ -39,7 +39,7 @@ function Clear-WinUtilDiskJunkDef {
                 # Windows.old belongs to TrustedInstaller; ownership must move before an
                 # administrator can delete it at all.
                 if ($Def.Takeown) {
-                    Append-WinUtilDiskLog -Message "$($Def.Name)：正在取得所有权（$($dir.FullName)），可能需要几分钟……"
+                    Write-WinUtilDiskLog -Message "$($Def.Name)：正在取得所有权（$($dir.FullName)），可能需要几分钟……"
                     & takeown.exe /F $dir.FullName /R /D Y 2>&1 | Out-Null
                     & icacls.exe $dir.FullName /GRANT "*S-1-5-32-544:(OI)(CI)F" /T /C /Q 2>&1 | Out-Null
                 }

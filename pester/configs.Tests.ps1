@@ -1,4 +1,4 @@
-#===========================================================================
+﻿#===========================================================================
 # Tests - Config Files
 #===========================================================================
 
@@ -112,6 +112,53 @@ function script:Get-WinUtilButtonSwitchNames {
         ForEach-Object { $_.Groups[1].Value } |
         Sort-Object -Unique
 }
+
+function script:Get-WinUtilButtonRouteNames {
+    $routes = Get-WinUtilConfigObject -Name "routes"
+    @($routes.PSObject.Properties.Name)
+}
+
+# Every button the dispatcher can act on: the ones declared in config\routes.json plus the literal
+# branches still written in Invoke-WPFButton.ps1.
+function script:Get-WinUtilHandledButtonNames {
+    @((Get-WinUtilButtonRouteNames) + (Get-WinUtilButtonSwitchNames)) | Sort-Object -Unique
+}
+
+# Function name -> its declared parameters, its source file and its text. The route config spells
+# out both ends of a call in data, so the compiler can no longer tell a mistyped handler or
+# argument name from a valid one and this is where that gets checked instead.
+function script:Get-WinUtilFunctionParameterMap {
+    $map = @{}
+
+    Get-ChildItem -Path $script:functionRoot -Filter *.ps1 -Recurse | ForEach-Object {
+        $sourceFile = $_.FullName
+        $tokens = $null
+        $syntaxErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($sourceFile, [ref]$tokens, [ref]$syntaxErrors)
+        if ($syntaxErrors.Count -ne 0) {
+            throw ($syntaxErrors | Out-String)
+        }
+
+        foreach ($function in @($ast.EndBlock.Statements | Where-Object { $_ -is [System.Management.Automation.Language.FunctionDefinitionAst] })) {
+            $map[$function.Name] = [pscustomobject]@{
+                # A signature parameter hangs off the param block, or off the function itself when
+                # it is written inline ("function Get-Thing([string]$Name)"); anything deeper belongs
+                # to a nested scriptblock and is not something a route can pass to.
+                Parameters = @($function.FindAll({
+                    param($node)
+                    $node -is [System.Management.Automation.Language.ParameterAst]
+                }, $true) | Where-Object {
+                    $_.Parent -is [System.Management.Automation.Language.ParamBlockAst] -or
+                        $_.Parent -is [System.Management.Automation.Language.FunctionDefinitionAst]
+                } | ForEach-Object { $_.Name.VariablePath.UserPath })
+                Source = $sourceFile
+                Text = $function.Extent.Text
+            }
+        }
+    }
+
+    return $map
+}
 }
 
 Describe "Config files" {
@@ -161,6 +208,16 @@ Describe "Applications config" {
             $hasInstallSource = $false
             foreach ($sourceField in @("winget", "choco")) {
                 if ($entryFields -contains $sourceField -and -not [string]::IsNullOrWhiteSpace([string]$entry.Value.$sourceField)) {
+                    $hasInstallSource = $true
+                }
+            }
+
+            # The share-first tiles (向日葵企业版、美团收银) have no winget/choco id: they run a
+            # handler of their own. Requiring the handler file to exist keeps this a real check
+            # instead of a blanket exemption.
+            if (-not $hasInstallSource) {
+                $handler = Join-Path $script:functionRoot "public\Invoke-WPFInstall$($entry.Name).ps1"
+                if (Test-Path -LiteralPath $handler) {
                     $hasInstallSource = $true
                 }
             }
@@ -388,7 +445,7 @@ Describe "Preset config" {
             $feature.PSObject.Properties.Name
             $appx.PSObject.Properties.Name
             $applications.PSObject.Properties.Name | ForEach-Object { "WPFInstall$_" }
-            Get-WinUtilButtonSwitchNames
+            Get-WinUtilHandledButtonNames
         ) | Sort-Object -Unique
 
         $invalidReferences = New-Object System.Collections.Generic.List[string]
@@ -433,7 +490,7 @@ Describe "App navigation config" {
         $requiredFields = @("Content", "Category", "Type", "Order", "Description")
         $allowedTypes = @("Button", "RadioButton", "Note")
         $supportedButtons = @(
-            Get-WinUtilButtonSwitchNames
+            Get-WinUtilHandledButtonNames
             $feature.PSObject.Properties.Name
         ) | Sort-Object -Unique
         $invalidEntries = New-Object System.Collections.Generic.List[string]
@@ -549,7 +606,15 @@ Describe "UI-rendered config entries" {
         $invalidEntries = New-Object System.Collections.Generic.List[string]
 
         foreach ($entry in $feature.PSObject.Properties) {
-            foreach ($missingField in (Get-WinUtilMissingRequiredFields -EntryName $entry.Name -Entry $entry.Value -RequiredFields $requiredFields)) {
+            # link only feeds the favicon and the "打开应用官网" tooltip, both skipped when it is
+            # empty; an entry that runs a local function (微软五笔) has no website to point at
+            $entryRequired = if ($entry.Value.function) {
+                @("Content", "category", "panel")
+            } else {
+                $requiredFields
+            }
+
+            foreach ($missingField in (Get-WinUtilMissingRequiredFields -EntryName $entry.Name -Entry $entry.Value -RequiredFields $entryRequired)) {
                 $invalidEntries.Add($missingField)
             }
 
@@ -586,7 +651,7 @@ Describe "UI-rendered config entries" {
         $requiredFields = @("Content", "category", "panel", "link")
         $allowedTypes = @("Button", "Combobox", "Toggle", "ToggleButton")
         $allowedServiceStartupTypes = @("Automatic", "AutomaticDelayedStart", "Disabled", "Manual")
-        $supportedButtons = Get-WinUtilButtonSwitchNames
+        $supportedButtons = Get-WinUtilHandledButtonNames
         $invalidEntries = New-Object System.Collections.Generic.List[string]
 
         foreach ($entry in $tweaks.PSObject.Properties) {
@@ -761,6 +826,77 @@ Describe "Embedded config scripts" {
 
         if ($invalidScripts.Count -gt 0) {
             throw ($invalidScripts -join "`n")
+        }
+    }
+}
+
+Describe "Button route config" {
+    BeforeAll {
+        $script:routes = Get-WinUtilConfigObject -Name "routes"
+        $script:functionMap = Get-WinUtilFunctionParameterMap
+    }
+
+    It "names a handler and a confirmation function that exist" {
+        $invalid = [System.Collections.Generic.List[string]]::new()
+
+        foreach ($entry in $routes.PSObject.Properties) {
+            foreach ($field in @("function", "confirm")) {
+                $name = $entry.Value.$field
+                if (-not $name) { continue }
+                if (-not $functionMap.ContainsKey([string]$name)) {
+                    $invalid.Add("$($entry.Name).$field names undefined function $name")
+                }
+            }
+
+            if (-not $entry.Value.function -and -not $entry.Value.work) {
+                $invalid.Add("$($entry.Name) declares neither a handler nor a job")
+            }
+        }
+
+        if ($invalid.Count -gt 0) {
+            throw ($invalid -join "`n")
+        }
+    }
+
+    It "passes only parameters the handler declares" {
+        $invalid = [System.Collections.Generic.List[string]]::new()
+
+        foreach ($entry in $routes.PSObject.Properties) {
+            if (-not $entry.Value.arguments) { continue }
+
+            $handler = $functionMap[[string]$entry.Value.function]
+            foreach ($argument in $entry.Value.arguments.PSObject.Properties) {
+                # The dispatcher adds this one itself, and only for a route that asks to be confirmed
+                if ($entry.Value.confirm -and $argument.Name -eq "Confirmed") { continue }
+
+                if ($handler.Parameters -notcontains $argument.Name) {
+                    $invalid.Add("$($entry.Name) passes $($argument.Name), which $($entry.Value.function) does not declare")
+                }
+            }
+        }
+
+        if ($invalid.Count -gt 0) {
+            throw ($invalid -join "`n")
+        }
+    }
+
+    It "does not wrap a handler that starts a job of its own" {
+        # The job layer keeps a single slot and refuses a second job while one runs, so a button
+        # whose handler already opens a job would get its own work refused the moment the wrapper
+        # claims the slot. The refusal is silent, and the click appears to do nothing.
+        $doubleWrapped = [System.Collections.Generic.List[string]]::new()
+
+        foreach ($entry in $routes.PSObject.Properties) {
+            if (-not $entry.Value.work -or -not $entry.Value.function) { continue }
+
+            $handler = $functionMap[[string]$entry.Value.function]
+            if ($handler -and $handler.Text -match '\bStart-WinUtilJob\b') {
+                $doubleWrapped.Add("$($entry.Name) is wrapped in a job and $($entry.Value.function) starts one too")
+            }
+        }
+
+        if ($doubleWrapped.Count -gt 0) {
+            throw ($doubleWrapped -join "`n")
         }
     }
 }

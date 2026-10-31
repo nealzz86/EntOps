@@ -24,41 +24,37 @@ function Invoke-WPFButton {
         Step-WinUtilJob -Hide
     }
 
-    # Switch-driven buttons that change the system. Anything in feature.json counts too. The
-    # WPFPanel* entries are the exception only when they hand off to a Windows applet, which is
-    # what a missing function means; the two that carry one change the system themselves and
-    # would otherwise run their waits on the interface thread with nothing reporting them.
-    #
-    # This is a whitelist on purpose: window chrome and popup toggles also reach here, because
-    # every Button in $sync gets wired to this function, and they must not become jobs.
-    $workButtons = @(
-        "WPFInstallUpgrade", "WPFAddUltPerf", "WPFRemoveUltPerf",
-        "WPFUpdatesdefault", "WPFUpdatesdisable", "WPFUpdatessecurity",
-        "WPFGetInstalledAppx"
-    )
-
     $featureEntry = $sync.configs.feature.$Button
+    $route = Get-WinUtilButtonRoute -Button $Button
+
     # Feature installation owns its selection validation and snapshots the selection before it
     # starts a job. Wrapping it here would turn its "nothing selected" return into job success.
     $isConfigWork = $featureEntry -and $Button -ne "WPFFeatureInstall" -and
         ($Button -notlike "WPFPanel*" -or $featureEntry.function)
 
-    if ($isConfigWork -or $workButtons -contains $Button) {
-        $updatesDisableConfirmed = $false
-        if ($Button -eq "WPFUpdatesdisable") {
-            $updatesDisableConfirmed = Confirm-WPFUpdatesdisable
-            if (-not $updatesDisableConfirmed) {
+    # Which buttons change the system is declared beside what they run, in config\routes.json.
+    # It has to stay a declaration and not "everything reaches here": window chrome and popup
+    # toggles are routed through this function as well, because every Button in $sync is wired
+    # to it, and turning those into jobs would block the interface on a click that paints a panel.
+    if ($isConfigWork -or $route.work -eq $true) {
+        # Confirmed here, on the interface thread, before the worker exists: a modal dialog raised
+        # inside a job has no window of its own to hold it, and the user would be asked after the
+        # work had already started.
+        $actionConfirmed = $true
+        if ($route.confirm) {
+            $actionConfirmed = [bool](& $route.confirm)
+            if (-not $actionConfirmed) {
                 return
             }
         }
 
         Start-WinUtilJob -Name (Get-WinUtilButtonLabel -Button $Button) -Parameters @{
             Button = $Button
-            UpdatesDisableConfirmed = $updatesDisableConfirmed
+            Confirmed = $actionConfirmed
         } -ScriptBlock {
-            param($Button, $UpdatesDisableConfirmed)
+            param($Button, $Confirmed)
 
-            Invoke-WPFButtonAction -Button $Button -UpdatesDisableConfirmed:$UpdatesDisableConfirmed
+            Invoke-WPFButtonAction -Button $Button -Confirmed:$Confirmed
         }
         return
     }
@@ -70,6 +66,26 @@ function Invoke-WPFButton {
     } catch {
         Write-WinUtilErrorRecord -ErrorRecord $_ -Component "UI" -Context "Button '$Button'"
     }
+}
+
+function Get-WinUtilButtonRoute {
+
+    <#
+
+    .SYNOPSIS
+        Returns the config\routes.json entry for a button, or null when it has none
+
+    .DESCRIPTION
+        One entry per button: the function it calls, the arguments it calls it with, whether the
+        click changes the system and whether it has to be confirmed first. A button is allowed to
+        declare only part of that - the wildcard families and the handful of controls whose action
+        is a line of code rather than a function call stay in Invoke-WPFButtonAction.
+
+    #>
+
+    param([string]$Button)
+
+    return $sync.configs.routes.$Button
 }
 
 function Get-WinUtilButtonLabel {
@@ -122,7 +138,7 @@ function Invoke-WPFButtonAction {
 
     Param (
         [string]$Button,
-        [switch]$UpdatesDisableConfirmed
+        [switch]$Confirmed
     )
 
     # Check if button is defined in feature config with function or InvokeScript
@@ -149,78 +165,40 @@ function Invoke-WPFButtonAction {
         }
     }
 
-    # Fallback to hard-coded switch for buttons not in feature.json
+    # The button's own declaration in config\routes.json: which function to call and with what.
+    $route = Get-WinUtilButtonRoute -Button $Button
+    if ($route -and $route.function) {
+        if (-not (Get-Command $route.function -ErrorAction SilentlyContinue)) {
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "按钮「$Button」声明的处理函数 $($route.function) 不存在，点击无效。"
+            return
+        }
+
+        $arguments = @{}
+        if ($route.arguments) {
+            foreach ($argument in $route.arguments.PSObject.Properties) {
+                $arguments[$argument.Name] = $argument.Value
+            }
+        }
+
+        # Only a route that asks to be confirmed receives the answer, so the click cannot silently
+        # skip a handler that takes no such parameter
+        if ($route.confirm) {
+            $arguments.Confirmed = [bool]$Confirmed
+        }
+
+        & $route.function @arguments
+        return
+    }
+
+    # What stays in code: the wildcard families, whose key is a shape rather than a button name,
+    # the window chrome, and the three selection loops that walk the AppX hashtable. A route is
+    # allowed to declare only "work", which lands here as well - WPFGetInstalledAppx does.
     Switch -Wildcard ($Button) {
         "WPFTab?BT" {Invoke-WPFTab $Button}
         "WPFTab??BT" {Invoke-WPFTab $Button}
-        "WPFInstall" {Invoke-WPFInstall}
-        "WPFUninstall" {Invoke-WPFUnInstall}
-        "WPFInstallUpgrade" {Invoke-WPFInstallUpgrade}
-        "WPFCollapseAllCategories" {Invoke-WPFToggleAllCategories -Action "Collapse"}
-        "WPFExpandAllCategories" {Invoke-WPFToggleAllCategories -Action "Expand"}
-        "WPFStandard" {Invoke-WPFPresets "Standard" -checkboxfilterpattern "WPFTweak*"}
-        "WPFMinimal" {Invoke-WPFPresets "Minimal" -checkboxfilterpattern "WPFTweak*"}
-        "WPFAdvanced" {Invoke-WPFPresets "Advanced" -checkboxfilterpattern "WPFTweak*"}
-        "WPFClearTweaksSelection" {Invoke-WPFPresets -imported $true -checkboxfilterpattern "WPFTweak*"}
-        "WPFClearInstallSelection" {Invoke-WPFPresets -imported $true -checkboxfilterpattern "WPFInstall*"}
-        "WPFtweaksbutton" {Invoke-WPFtweaksbutton}
-        "WPFOOSUbutton" {Invoke-WPFOOSU}
-        "WPFAddUltPerf" {Invoke-WPFUltimatePerformance -Enable}
-        "WPFRemoveUltPerf" {Invoke-WPFUltimatePerformance}
-        "WPFundoall" {Invoke-WPFundoall}
-        "WPFUpdatesdefault" {Invoke-WPFUpdatesdefault}
-        "WPFUpdatesdisable" {Invoke-WPFUpdatesdisable -Confirmed:$UpdatesDisableConfirmed}
-        "WPFUpdatessecurity" {Invoke-WPFUpdatessecurity}
-        "WPFGetInstalled" {Invoke-WPFGetInstalled -CheckBox "winget"}
-        "WPFGetInstalledTweaks" {Invoke-WPFGetInstalled -CheckBox "tweaks"}
-        "WPFAppxRemoval" {Invoke-WPFTab "WPFTab6BT"}
-        "WPFBackToTweaks" {Invoke-WPFTab "WPFTab2BT"}
-        "WPFOverviewGoInstall" {Invoke-WPFTab "WPFTab1BT"}
-        "WPFOverviewGoTweaks" {Invoke-WPFTab "WPFTab2BT"}
-        "WPFOverviewGoUpdates" {Invoke-WPFTab "WPFTab4BT"}
-        "WPFOverviewGoISO" {Invoke-WPFTab "WPFTab5BT"}
-        "WPFOverviewGoPrinter" {Invoke-WPFTab "WPFTab7BT"}
-        "WPFOverviewGoClean" {Invoke-WPFTab "WPFTab8BT"}
-        "WPFOverviewGoNet" {Invoke-WPFTab "WPFTab11BT"}
-        "WPFOverviewRefresh" {Invoke-WinUtilOverviewPopulate}
-        "WPFPrinterInstall" {Invoke-WPFPrinterInstall}
-        "WPFShareMapOnly" {Invoke-WPFShareMapOnly}
-        "WPFReceiptScan" {Invoke-WPFReceiptScan}
-        "WPFReceiptSetXp" {Invoke-WPFReceiptSetXp}
-        "WPFReceiptEpsonWeb" {Invoke-WPFReceiptEpsonWeb}
-        "WPFReceiptSyncPort" {Invoke-WPFReceiptSyncPort}
-        "WPFDiskScan" {Invoke-WPFDiskScan}
-        "WPFDiskClean" {Invoke-WPFDiskClean}
-        "WPFDiskAnaScan" {Invoke-WPFDiskAnaScan}
-        "WPFDiskAnaUp" {Invoke-WPFDiskAnaUp}
-        "WPFFNetHealthRefresh" {Invoke-WPFNetHealthRefresh}
-        "WPFFNetPing" {Invoke-WPFNetPing}
-        "WPFFNetTrace" {Invoke-WPFNetTrace}
-        "WPFFNetPortScan" {Invoke-WPFNetPortScan}
-        "WPFFNetSession" {Invoke-WPFNetSession}
-        "WPFFNetWan" {Invoke-WPFNetWan}
-        "WPFFNetResolve" {Invoke-WPFNetResolve}
-        "WPFFNetDnsBenchmark" {Invoke-WPFNetDnsBenchmark}
-        "WPFFNetPorts" {Invoke-WPFNetPorts}
-        "WPFFNetHosts" {Invoke-WPFNetHosts}
-        "WPFFNetCamera" {Invoke-WPFNetCamera}
-        "WPFFNetDhcp" {Invoke-WPFNetDhcp}
-        "WPFFNetAudit" {Invoke-WPFNetAudit}
-        "WPFFNetLan" {Invoke-WPFNetLan}
-        "WPFFNetEvents" {Invoke-WPFNetEvents}
-        "WPFFNetPktStart" {Invoke-WPFNetPktStart}
-        "WPFFNetPktStop" {Invoke-WPFNetPktStop}
-        "WPFFNetPktOpen" {Invoke-WPFNetPktOpen}
         # The tool rows all end in the tool name, so one branch covers fourteen of them and a new
         # row only has to add a case inside Invoke-WPFNetTool
         "WPFFNetTool*" {Invoke-WPFNetTool -Button $Button}
-        "WPFEntCleanDetect" {Invoke-WPFEntCleanDetect}
-        "WPFEntCleanRun" {Invoke-WPFEntCleanRun}
-        "WPFInstallSunlogin" {Invoke-WPFInstallSunlogin}
-        "WPFInstallMeituanPOS" {Invoke-WPFInstallMeituanPOS}
-        "WPFInstallSelectedAppx" {Invoke-WPFAppxInstall}
-        "WPFRemoveSelectedAppx" {Invoke-WPFAppxRemoval}
-        "WPFDefaultAppxSelection" {Invoke-WPFPresets "AppxDefault" -checkboxfilterpattern "WPFAppx*"}
         "WPFSelectAllAppx" {
             $sync.configs.appxHashtable.Keys | ForEach-Object {$sync.$_.IsChecked = $true}
         }
@@ -250,5 +228,11 @@ function Invoke-WPFButtonAction {
             }
         }
         "WPFselectedAppsButton" {$sync.selectedAppsPopup.IsOpen = -not $sync.selectedAppsPopup.IsOpen}
+        # Every control reaches this function, so a button that matches nothing here, in
+        # feature.json and in routes.json is a wiring mistake rather than an idle control - and
+        # the only way to find one by hand is to click it and watch nothing happen.
+        default {
+            Write-WinUtilLog -Level "WARN" -Component "UI" -Message "按钮「$Button」没有声明处理方式，点击后什么都没发生。"
+        }
     }
 }
