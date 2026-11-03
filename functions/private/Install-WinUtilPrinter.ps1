@@ -281,7 +281,7 @@ function Stop-WinUtilPrinterInstall {
         Write-Host "  [错误] $Reason"
     }
 
-    Step-WinUtilJob -Status "安装失败" -Percent 100 -State Error -Overlay Warning
+    Step-WinUtilJob -Status "安装失败" -Percent 100 -State Error
     Write-Host ""
     Write-Host "======================================================"
     Write-Host "              ❌ 安装失败，请检查："

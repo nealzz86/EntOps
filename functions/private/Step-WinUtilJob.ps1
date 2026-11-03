@@ -11,9 +11,15 @@ function Step-WinUtilJob {
             a failure, re-raises that stop. The job layer clears the flags before its own finish
             reporting for that reason.
 
-            Drives the progress bar and taskbar item together and does nothing without a window,
-            so job bodies need no UI checks. The update is posted rather than waited on: a job
-            reporting per item would otherwise stall on the interface thread each time.
+            Drives the progress bar in the window and does nothing without one, so job bodies need
+            no UI checks. The update is posted rather than waited on: a job reporting per item would
+            otherwise stall on the interface thread each time.
+
+            Nothing here touches the taskbar. Writing TaskbarItemInfo is a call into explorer with
+            no timeout of its own, and explorer is exactly the process that is busy while a printer
+            install churns the spooler - the interface thread went in during a driver install and
+            never came back, freezing a window whose work had already finished. The bar in the
+            window carries the same information without crossing a process boundary.
 
         .PARAMETER Status
             Text for the progress label
@@ -22,10 +28,8 @@ function Step-WinUtilJob {
             Completion between 0 and 100
 
         .PARAMETER State
-            Taskbar state. Normal while working, Error on failure, None when finished.
-
-        .PARAMETER Overlay
-            Taskbar overlay icon: logo, checkmark, warning or None
+            How the run is going: Normal while working, Error on failure, Paused when it finished
+            with something to look at, None when it is over
 
         .PARAMETER Hide
             Clears and hides the progress bar. Used when leaving a finished job behind rather
@@ -36,7 +40,6 @@ function Step-WinUtilJob {
         [int]$Percent = -1,
         [ValidateSet("Normal", "Error", "Paused", "Indeterminate", "None")]
         [string]$State,
-        [string]$Overlay,
         [switch]$Hide
     )
 
@@ -60,13 +63,15 @@ function Step-WinUtilJob {
         Status = $Status
         Percent = [Math]::Min([Math]::Max($Percent, -1), 100)
         State = $State
-        Overlay = $Overlay
         HideBar = [bool]$Hide
         HasStatus = $PSBoundParameters.ContainsKey('Status')
         HasState = $PSBoundParameters.ContainsKey('State')
-        HasOverlay = $PSBoundParameters.ContainsKey('Overlay')
     } -ScriptBlock {
-        param($Status, $Percent, $State, $Overlay, $HideBar, $HasStatus, $HasState, $HasOverlay)
+        param($Status, $Percent, $State, $HideBar, $HasStatus, $HasState)
+
+        # What the interface thread last began painting. The watchdog quotes it so a frozen window
+        # can be told apart: "it never reached this update" versus "it hung inside one".
+        $sync.UiLastUiOperation = if ($HasStatus) { $Status } else { "进度 $Percent%" }
 
         if ($HideBar) {
             $sync.WPFTweaksProgressBar.Visibility = [Windows.Visibility]::Collapsed
@@ -87,9 +92,6 @@ function Step-WinUtilJob {
         }
         if ($hasPercent) {
             $sync.WPFTweaksProgressValue.Value = $Percent
-            # Through the guard rather than the property: writing the shell's progress bar is the
-            # part of this that can block, and it is the one thing here that can be given up on.
-            Set-WinUtilTaskbaritem -value ($Percent / 100)
         }
         if ($HasState) {
             # Pulse in place at whatever progress has been reached. IsIndeterminate would make
@@ -103,11 +105,6 @@ function Step-WinUtilJob {
                 default  { "ProgressBarForegroundColor" }
             }
             $sync.WPFTweaksProgressValue.SetResourceReference([Windows.Controls.Control]::ForegroundProperty, $barColor)
-
-            Set-WinUtilTaskbaritem -state $State
-        }
-        if ($HasOverlay) {
-            Set-WinUtilTaskbaritem -overlay $Overlay
         }
     }
 }

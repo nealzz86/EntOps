@@ -341,8 +341,11 @@ if ($sync.IsExeHost) {
 
     function global:Clear-Host { }
 } else {
+    # Recorded only once the transcript is really open: shutdown asks this whether there is
+    # anything to stop, and Stop-Transcript on a host that never started one writes an error the
+    # packaged exe's GUI host answers with a modal box the user has to click away.
+    Start-Transcript -Path $sync.logPath -Append -NoClobber | Out-Null
     $sync.transcriptPath = $sync.logPath
-    Start-Transcript -Path $sync.transcriptPath -Append -NoClobber | Out-Null
 
     $Host.UI.RawUI.WindowTitle = "WinUtil"
     Clear-Host

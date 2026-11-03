@@ -86,9 +86,13 @@ function Register-WinUtilUiWatchdog {
                     if (-not $sync.UiWatchdogStalled) {
                         $sync.UiWatchdogStalled = $true
                         $task = if ($sync.ActiveJobLabel) { $sync.ActiveJobLabel } else { "空闲" }
+                        # LastStepStatus is what the worker asked for; UiLastUiOperation is what the
+                        # interface thread actually started painting. Only the second one says whether
+                        # the update was still sitting in the queue when the thread stopped answering.
                         Write-WinUtilLog -Level "ERROR" -Component "UI" -Message (
-                            "界面线程 $([int]$Watch.StallSeconds) 秒没有处理排到它队列里的操作（当时任务：$task，最后一步：$($sync.LastStepStatus)）。" +
-                            "画面会停在最后一帧、点击不生效，说明界面线程卡在了一个不返回的外部调用里（任务栏、打印服务这类跨进程调用没有超时）。")
+                            "界面线程 $([int]$Watch.StallSeconds) 秒没有处理排到它队列里的操作（当时任务：$task，最后一步：$($sync.LastStepStatus)，界面线程最后开始的操作：$($sync.UiLastUiOperation)）。" +
+                            "画面会停在最后一帧、点击不生效，说明界面线程卡在了一个不返回的外部调用里（任务栏、打印服务这类跨进程调用没有超时）。" +
+                            "后台任务本身可能已经做完，往上找一条 job finished 就能确认；这个窗口可以直接关掉，不必等它。")
                     }
                     continue
                 }

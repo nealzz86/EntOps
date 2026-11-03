@@ -177,6 +177,22 @@ exit 23
         $script:mainScript | Should -Match '\} finally \{[\s\S]*Close-WinUtilRunspacePool[\s\S]*Stop-Transcript'
     }
 
+    It "stops only a transcript it actually started" {
+        # Stop-Transcript on a host that is not transcribing writes an error record, and the
+        # packaged exe's GUI host answers every error record with a modal box: the run used to end
+        # with "error while stopping the script" the user had to click away after closing the window
+        $script:mainScript | Should -Match 'if \(\$sync\.transcriptPath\) \{ Stop-Transcript'
+        $unguarded = @(
+            $script:mainScript -split "`r?`n" |
+                Where-Object { $_ -match 'Stop-Transcript' } |
+                Where-Object { $_ -notmatch 'if \(\$sync\.transcriptPath\) \{ Stop-Transcript' }
+        )
+        $unguarded | Should -BeNullOrEmpty -Because ($unguarded -join " | ")
+
+        # The flag only means something if the path is recorded once the transcript is open
+        $script:startScript | Should -Match 'Start-Transcript[\s\S]{0,120}\$sync\.transcriptPath = \$sync\.logPath'
+    }
+
     It "names the presets that exist when given one that does not" {
         $script:mainScript | Should -Match "There is no preset called"
     }

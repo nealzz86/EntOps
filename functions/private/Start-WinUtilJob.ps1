@@ -89,7 +89,7 @@ function Start-WinUtilJob {
 
         Write-WinUtilLog -Component $Name -Message "$Name job started."
         Write-WinUtilJobBanner -Message $label
-        Step-WinUtilJob -Status "$label..." -Percent 0 -State "Normal" -Overlay "logo"
+        Step-WinUtilJob -Status "$label..." -Percent 0 -State "Normal"
 
         if ($DisableAppList -and (Test-WinUtilUIAlive)) {
             Invoke-WPFUIThread -ScriptBlock {
@@ -142,15 +142,15 @@ function Start-WinUtilJob {
             if ($newErrors -gt 0) {
                 Write-WinUtilLog -Level "WARN" -Component $JobName -Message "$JobName job finished in $($jobClock.ElapsedMilliseconds) ms with $newErrors error(s)."
                 Write-WinUtilJobBanner -Message "$JobLabel 已完成，发现 $newErrors 个错误，详见日志" -Level "ERROR"
-                Step-WinUtilJob -Status "$JobLabel 已完成，发现 $newErrors 个错误" -Percent 100 -State "Paused" -Overlay "warning"
+                Step-WinUtilJob -Status "$JobLabel 已完成，发现 $newErrors 个错误" -Percent 100 -State "Paused"
             } elseif ($newWarnings -gt 0) {
                 Write-WinUtilLog -Level "WARN" -Component $JobName -Message "$JobName job finished in $($jobClock.ElapsedMilliseconds) ms with $newWarnings warning(s)."
                 Write-WinUtilJobBanner -Message "$JobLabel 已完成，发现 $newWarnings 个警告，详见日志"
-                Step-WinUtilJob -Status "$JobLabel 已完成，发现 $newWarnings 个警告" -Percent 100 -State "Paused" -Overlay "warning"
+                Step-WinUtilJob -Status "$JobLabel 已完成，发现 $newWarnings 个警告" -Percent 100 -State "Paused"
             } else {
                 Write-WinUtilLog -Component $JobName -Message "$JobName job finished in $($jobClock.ElapsedMilliseconds) ms."
                 Write-WinUtilJobBanner -Message "$JobLabel 已完成"
-                Step-WinUtilJob -Status "$JobLabel 已完成" -Percent 100 -State "None" -Overlay "checkmark"
+                Step-WinUtilJob -Status "$JobLabel 已完成" -Percent 100 -State "None"
             }
         } catch {
             $jobClock.Stop()
@@ -159,7 +159,7 @@ function Start-WinUtilJob {
             $errorAlreadyReported = $_.Exception.Data["WinUtilErrorReported"] -eq $true
             Write-WinUtilErrorRecord -ErrorRecord $_ -Component $JobName -Context "$JobName failed after $($jobClock.ElapsedMilliseconds) ms" -DetailOnly:$errorAlreadyReported
             Write-WinUtilJobBanner -Message "$JobLabel 失败：$($_.Exception.Message)" -Level "ERROR"
-            Step-WinUtilJob -Status "$JobLabel 失败" -Percent 100 -State "Error" -Overlay "warning"
+            Step-WinUtilJob -Status "$JobLabel 失败" -Percent 100 -State "Error"
         } finally {
             $jobResult = [pscustomobject]@{
                 Token = $JobToken
@@ -213,7 +213,7 @@ function Start-WinUtilJob {
             Write-WinUtilErrorRecord -ErrorRecord $scheduleError -Component $Name -Context "Could not schedule $Name"
             $sync.LastJobResult = [pscustomobject]@{ Token = $jobToken; Errors = 1; Warnings = 0 }
             Write-WinUtilJobBanner -Message "$label 无法启动" -Level "ERROR"
-            Step-WinUtilJob -Status "$label 无法启动" -Percent 100 -State "Error" -Overlay "warning"
+            Step-WinUtilJob -Status "$label 无法启动" -Percent 100 -State "Error"
         } catch {
             Write-WinUtilLog -Level "WARN" -Component $Name -Message "Could not report that $Name failed to start: $($_.Exception.Message)"
         } finally {

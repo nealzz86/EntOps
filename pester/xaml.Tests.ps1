@@ -576,6 +576,9 @@ Describe "XAML and sync wiring" {
             # Last job step timestamp/status, written by Step-WinUtilJob.ps1 and read by the watchdog
             "LastStepAt",
             "LastStepStatus",
+            # The progress update the interface thread last started painting, so a stall in the log
+            # can say whether the update was still queued or the thread hung inside one
+            "UiLastUiOperation",
             # Software-render fallback flag, set by Set-WinUtilRenderMode.ps1 for Remote Desktop
             "SoftwareRender",
             # Interface watchdog bookkeeping, all owned by Register-WinUtilUiWatchdog.ps1

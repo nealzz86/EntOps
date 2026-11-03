@@ -20,7 +20,7 @@ BeforeAll {
         param($Message, $Level, $Component, [switch]$Detail)
     }
     function Step-WinUtilJob {
-        param([string]$Status, [int]$Percent, [string]$State, [string]$Overlay, [switch]$Hide)
+        param([string]$Status, [int]$Percent, [string]$State, [switch]$Hide)
     }
     function Show-WinUtilMessage {
         param($Message, $Title, $Button, $Icon)
@@ -212,7 +212,7 @@ Describe "Start-WinUtilJob" {
         Start-WinUtilJob -Name "Example" -Description "Doing the thing" -ScriptBlock { } | Out-Null
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Doing the thing..." -and $Percent -eq 0 -and $State -eq "Normal" -and $Overlay -eq "logo"
+            $Status -eq "Doing the thing..." -and $Percent -eq 0 -and $State -eq "Normal"
         }
     }
 
@@ -298,7 +298,7 @@ Describe "Start-WinUtilJob" {
             $Component -eq "Example" -and $Message -like "Example job finished in * ms."
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example 已完成" -and $Percent -eq 100 -and $State -eq "None" -and $Overlay -eq "checkmark"
+            $Status -eq "Example 已完成" -and $Percent -eq 100 -and $State -eq "None"
         }
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
@@ -342,7 +342,7 @@ Describe "Start-WinUtilJob" {
             $Level -eq "ERROR" -and $Component -eq "Example" -and $Message -like "*failed after * ms : boom"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example 失败" -and $State -eq "Error" -and $Overlay -eq "warning"
+            $Status -eq "Example 失败" -and $State -eq "Error"
         }
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
@@ -391,7 +391,7 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example 已完成，发现 1 个错误" -and $State -eq "Paused" -and $Overlay -eq "warning"
+            $Status -eq "Example 已完成，发现 1 个错误" -and $State -eq "Paused"
         }
         $script:sync.ActiveJob | Should -BeNullOrEmpty
     }
@@ -410,7 +410,7 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example 已完成" -and $State -eq "None" -and $Overlay -eq "checkmark"
+            $Status -eq "Example 已完成" -and $State -eq "None"
         }
     }
 
@@ -430,7 +430,7 @@ Describe "Start-WinUtilJob" {
             $Level -eq "WARN" -and $Message -eq "a warning"
         }
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Example 已完成，发现 1 个警告" -and $State -eq "Paused" -and $Overlay -eq "warning"
+            $Status -eq "Example 已完成，发现 1 个警告" -and $State -eq "Paused"
         }
         $script:sync.LastJobResult.Warnings | Should -Be 1
         $script:sync.LastJobResult.Errors | Should -Be 0
@@ -448,7 +448,7 @@ Describe "Start-WinUtilJob" {
             -JobToken $script:capturedRunspaceArgs["JobToken"]
 
         Should -Invoke -CommandName Step-WinUtilJob -Times 1 -Exactly -ParameterFilter {
-            $Status -eq "Installing apps 已完成，发现 1 个警告" -and $State -eq "Paused" -and $Overlay -eq "warning"
+            $Status -eq "Installing apps 已完成，发现 1 个警告" -and $State -eq "Paused"
         }
     }
 

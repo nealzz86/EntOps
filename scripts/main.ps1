@@ -90,7 +90,7 @@ if ($Preset -or $Config) {
         Close-WinUtilRunspacePool
         [System.GC]::Collect()
         Remove-WinUtilTempScript
-        Stop-Transcript | Out-Null
+        if ($sync.transcriptPath) { Stop-Transcript | Out-Null }
     }
 
     # An isolated elevated child and an explicit file launch own their process. The documented
@@ -158,7 +158,10 @@ Close-WinUtilRunspacePool
 
 Remove-WinUtilTempScript
 Write-Host "Bye bye!" -ForegroundColor Cyan
-Stop-Transcript
+# Only the console host owns a transcript. Stopping one the packaged exe never started writes an
+# error record, and that host turns every error record into a modal box - here, right as the user
+# believes the run is finished.
+if ($sync.transcriptPath) { Stop-Transcript | Out-Null }
 
 if ($uiFailed) {
     $global:LASTEXITCODE = 1
