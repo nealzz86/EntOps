@@ -204,43 +204,20 @@ function Install-WinUtilPrinter {
         Stop-WinUtilPrinterInstall -Printer $Printer; return
     }
     Write-Host "  打印机添加成功。"
-
-    # 黑白机强制 dmColor=MONOCHROME
-    if (-not $Printer.SupportColor) {
-        [EntSpool]::SetColorMode($Printer.Name, $false)
-        Write-WinUtilEntNativeLog
-    }
     Step-WinUtilJob -Status "4/6 · 打印机已添加" -Percent 66
 
-    # ---------- [5/6] 易快报打印模式（自定义纸张） ----------
+    # ---------- [5/6] 易快报打印模式（自定义纸张）+ 黑白强制 ----------
     Step-WinUtilJob -Status "5/6 · 配置易快报打印模式中…" -Percent 66
-    $formOk = [EntSpool]::RegisterPaperForm($Printer.Name, $cfg.formName, [int]$cfg.formWidthTenthMm, [int]$cfg.formHeightTenthMm)
-    Write-WinUtilEntNativeLog
-    if (-not $formOk) {
+    if (-not (Set-WinUtilPrinterPaperAndColor -Printer $Printer)) {
         Write-Host "  [警告] 易快报纸张配置失败，但打印机已安装成功。"
     } else {
-        Write-Host "  正在重启 Print Spooler 服务以刷新缓存（会中断本机进行中的打印任务）..."
-        try {
-            Restart-Service -Name Spooler -Force -ErrorAction Stop
-            Write-Host "  Print Spooler 服务已重启，缓存已刷新。"
-        } catch {
-            Write-Host "  [警告] 重启 Spooler 失败：$($_.Exception.Message)"
-        }
         Write-Host "  [5/6] 易快报打印模式配置完成。"
-        Write-Host "  提示：如打印首选项下拉框未显示该纸张，请在应用中选择「自定义纸张尺寸」手动输入 140×240mm。"
     }
     Step-WinUtilJob -Status "5/6 · 纸张配置完成" -Percent 83
 
     # ---------- [6/6] 传统打印对话框 ----------
     Step-WinUtilJob -Status "6/6 · 启用传统打印对话框…" -Percent 83
-    try {
-        $printKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Print"
-        if (-not (Test-Path -LiteralPath $printKey)) { New-Item -Path $printKey -Force | Out-Null }
-        Set-ItemProperty -LiteralPath $printKey -Name "UseLegacyPrintDialog" -Value 1 -Type DWord
-        Write-Host "  已启用传统打印对话框（UseLegacyPrintDialog=1），纸张下拉框应能看到「$($cfg.formName)」。"
-    } catch {
-        Write-Host "  [警告] 启用传统打印对话框失败：$($_.Exception.Message)"
-    }
+    Enable-WinUtilLegacyPrintDialog -FormName $cfg.formName | Out-Null
     Step-WinUtilJob -Status "6/6 · 完成" -Percent 100
 
     if ($SetDefault) {

@@ -50,6 +50,10 @@ function Invoke-WPFDiskClean {
         Thumb    = "WPFDiskThumb";    Shaders  = "WPFDiskShaders"
         WeChat   = "WPFDiskWeChat";   Ding     = "WPFDiskDing"
         Wps      = "WPFDiskWps";      WinOld   = "WPFDiskWinOld"
+        AiChat   = "WPFDiskAiChat";   AiCoder  = "WPFDiskAiCoder"
+        AiUpdater = "WPFDiskAiUpdater"; AiModels = "WPFDiskAiModels"
+        LocalCache = "WPFDiskLocalCache"; LocalNet = "WPFDiskLocalNet"
+        LocalDev = "WPFDiskLocalDev"
     }
 
     $selectedIds = @()
@@ -67,13 +71,21 @@ function Invoke-WPFDiskClean {
         return
     }
 
+    $notes = @(
+        "回收站清空后无法找回，请确认无需恢复。"
+        "正在被占用的文件会自动跳过，不会中断清理。"
+    )
+    if ($selectedIds -contains "AiUpdater") { $notes += "「应用更新安装包残留」删的是已下载的升级包，应用下次检查更新时会重新下载。" }
+    if ($selectedIds -contains "AiModels") { $notes += "「本地大模型文件」删掉后需要重新下载，通常几 GB 到几十 GB，请先确认模型还能拿到。" }
+    if ($selectedIds -contains "LocalDev") { $notes += "「开发与自动化缓存」删掉后 pip/npm/uv/Playwright 要联网重新下载，单位离线环境请确认这台机器不再构建。" }
+    if ($selectedIds -contains "LocalCache") { $notes += "「AppData\Local 应用缓存」只动标准缓存与日志子目录，应用首次启动会稍慢一点。" }
+
     $answer = Show-WinUtilMessage -Title "磁盘清理" -Button "YesNo" -Icon "Warning" -Message @"
 将清理以下 $($selectedIds.Count) 类垃圾文件：
 
 $($selectedNames -join "、")
 
-- 回收站清空后无法找回，请确认无需恢复。
-- 正在被占用的文件会自动跳过，不会中断清理。
+- $($notes -join "`n- ")
 
 确定开始清理吗？
 "@

@@ -49,6 +49,7 @@ function Invoke-WPFTab {
             8 { "Overview" }
             9 { "DiskAna" }
             10 { "NetDiag" }
+            11 { "Baseline" }
             default { $sync.WPFTabNav.Items[$tabNumber].Header }
         }
 
@@ -65,6 +66,7 @@ function Invoke-WPFTab {
             "Overview" { @("概览", "设备状态与常用入口") }
             "DiskAna"  { @("磁盘分析", "磁盘空间占用下钻与大文件定位") }
             "NetDiag"  { @("网络诊断", "连通性、扫描、测速与抓包分析") }
+            "Baseline" { @("装机体检", "按本单位基线逐项核对，点不合格项直接修复") }
             default    { @([string]$sync.WPFTabNav.Items[$tabNumber].Header, "") }
         }
         if ($sync.ContainsKey("WPFPageTitle") -and $sync.WPFPageTitle) {

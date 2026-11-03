@@ -330,7 +330,8 @@ Describe "XAML document" {
             "WPFTab8:安全清理",
             "WPFTab9:概览",
             "WPFTab10:磁盘分析",
-            "WPFTab11:网络诊断"
+            "WPFTab11:网络诊断",
+            "WPFTab12:装机体检"
         )
 
         if (@($actualTabs).Count -ne $expectedTabs.Count) {
@@ -345,6 +346,27 @@ Describe "XAML document" {
     }
 
 
+
+    It "gives every fixed-size UniformGrid enough cells for its children" {
+        # A UniformGrid with both Rows and Columns written out overflows silently: children past
+        # Rows*Columns get drawn outside the panel, so the card border stops early and the page's
+        # ScrollViewer never learns the content grew taller. That is how the overview's last two
+        # quick-action tiles ended up cut in half with no way to scroll to them.
+        $overflowing = [System.Collections.Generic.List[string]]::new()
+        foreach ($grid in $script:xaml.SelectNodes('//*[local-name()="UniformGrid"]')) {
+            $rows = $grid.GetAttribute("Rows")
+            $columns = $grid.GetAttribute("Columns")
+            if (-not $rows -or -not $columns) { continue }   # one side auto-calculates: cannot overflow
+
+            $count = 0
+            foreach ($child in $grid.ChildNodes) { if ($child.NodeType -eq "Element") { $count++ } }
+            if ($count -gt ([int]$rows * [int]$columns)) {
+                $overflowing.Add("UniformGrid Rows=$rows Columns=$columns holds $count children")
+            }
+        }
+
+        $overflowing.Count | Should -Be 0 -Because ($overflowing -join "; ")
+    }
 
     It "centers top bar controls vertically" {
         # NavDockPanel is no longer part of the top bar: the console redesign moved it into the
@@ -411,8 +433,8 @@ Describe "XAML document" {
         # chips can restyle the dropdown button through an implicit lookup
         $comboToggle.GetAttribute("Style") | Should -Be "{StaticResource ComboBoxToggleButtonStyle}"
         $comboItemStyle | Should -Not -BeNullOrEmpty
-        # Eleven pages, but AppX is reached from the removal button instead of the nav rail
-        $navButtons.Count | Should -Be 10
+        # Twelve pages, but AppX is reached from the removal button instead of the nav rail
+        $navButtons.Count | Should -Be 11
         foreach ($navButton in $navButtons) {
             $navButton.GetAttribute("Style") | Should -Be "{StaticResource NavItemToggleStyle}"
         }
@@ -604,7 +626,16 @@ Describe "XAML and sync wiring" {
             # pktmon capture session, owned by PktmonCapture.ps1
             "PktmonFile",
             "PktmonRunning",
-            "PktmonStarted"
+            "PktmonStarted",
+            # Command palette result list and keyboard selection, owned by Invoke-WPFCommandPalette.ps1
+            "PaletteMatches",
+            "PaletteIndex",
+            # Generated printing-tab controls, rebuilt from the config on every visit: the selection
+            # lists and the configuration editor's rows
+            "EntPrinterRadios",
+            "EntShareChecks",
+            "EntCfgPrinterRows",
+            "EntCfgShareRows"
         )
         $allowedNames = @($xamlNames + $generatedNames + $dynamicStateNames) | Sort-Object -Unique
         $bracketReferences = @(

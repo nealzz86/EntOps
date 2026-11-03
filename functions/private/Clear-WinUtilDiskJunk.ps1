@@ -49,6 +49,13 @@ function Clear-WinUtilDiskJunkDef {
                 }
             }
         }
+
+        foreach ($pattern in @($Def.Files | Where-Object { $_ })) {
+            foreach ($file in @(Get-Item -Path $pattern -Force -ErrorAction SilentlyContinue)) {
+                if ($file.PSIsContainer) { continue }
+                Remove-Item -LiteralPath $file.FullName -Force -ErrorAction SilentlyContinue
+            }
+        }
     } finally {
         foreach ($svcName in $servicesStopped) {
             Start-Service -Name $svcName -ErrorAction SilentlyContinue

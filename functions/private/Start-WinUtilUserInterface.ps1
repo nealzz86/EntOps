@@ -210,9 +210,24 @@ function Start-WinUtilUserInterface {
     # add some shortcuts for people that don't like clicking
     function Invoke-WinUtilFontScaleStep([double]$Step) { $sync.FontScalingSlider.Value = [math]::Max(0.75, [math]::Min(2.0, $sync.FontScalingSlider.Value + $Step)); Invoke-WinUtilFontScaling -ScaleFactor $sync.FontScalingSlider.Value }
 
+    if ($sync.WPFPaletteInput) {
+        $sync.WPFPaletteInput.Add_TextChanged({ Update-WinUtilCommandPalette })
+    }
+
     $commonKeyEvents = {
         if ($sync.ActiveJob) {
             return
+        }
+
+        # The palette owns the keys while it is open, and the window sees them first: a tunneling
+        # PreViewKeyDown runs before the text box does, so handling them here is what keeps Enter
+        # from also reaching the search bar behind it.
+        if ($sync.PalettePopup -and $sync.PalettePopup.IsOpen) {
+            $paletteArgs = $_
+            if (Invoke-WPFPaletteKey -Key $_.Key) {
+                $paletteArgs.Handled = $true
+                return
+            }
         }
 
         # Handle key presses of single keys
@@ -235,6 +250,7 @@ function Start-WinUtilUserInterface {
             $keyEventArgs = $_
             switch ($_.Key) {
                 "F" { $sync.SearchBar.Focus() } # Focus on the search bar
+                "K" { Invoke-WPFCommandPalette -Action "Toggle"; $keyEventArgs.Handled = $true } # 功能搜索面板
                 "Q" { $this.Close() } # Close the application
             }
         }
@@ -436,15 +452,11 @@ function Start-WinUtilUserInterface {
 
         $authorInfo = @"
 工具     : 企业运维工具（EntOps）
-二次开发 : <a href="https://github.com/nealzz86">github.com/nealzz86</a>
-上游项目 : <a href="https://github.com/ChrisTitusTech/winutil">ChrisTitusTech/winutil</a>（原作者 <a href="https://github.com/ChrisTitusTech">@ChrisTitusTech</a>）
+定位     : 内部 IT 运维工具（装机、打印共享、网络排障）
+上游项目 : Chris Titus Tech winutil（MIT 许可）
 版本     : $($sync.version)
 "@
         Show-CustomDialog -Title "关于" -Message $authorInfo
-    })
-    $sync["DocumentationMenuItem"].Add_Click({
-        Invoke-WPFPopup -Action "Hide" -Popups @("Settings")
-        Start-Process "https://winutil.christitus.com/"
     })
     $sync["SponsorMenuItem"].Add_Click({
         Invoke-WPFPopup -Action "Hide" -Popups @("Settings")

@@ -57,6 +57,11 @@ function Initialize-WinUtilTabContent {
             "PrintShare" {
                 Initialize-WinUtilEntPrinterPanel
             }
+            # The checklist page is static markup, so all its first visit needs is the empty table
+            # saying the check-up has not run yet
+            "Baseline" {
+                Show-WinUtilBaselineResults -Rows @()
+            }
         }
         # Controls built just now start unchecked, so anything already chosen by an import or a
         # preset has to be applied to them once they exist

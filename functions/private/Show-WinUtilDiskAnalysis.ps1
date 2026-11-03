@@ -165,7 +165,7 @@ function Show-WinUtilDiskAnalysis {
         $more = New-Object Windows.Controls.TextBlock
         $more.Text = "…… 仅显示前 200 个子目录（跳过 0 字节目录）"
         $more.FontSize = 11
-        $more.FontStyle = [Windows.FontStyle]::Italic
+        $more.FontStyle = "Italic"
         $more.Margin = [Windows.Thickness]::new(2, 4, 0, 0)
         $more.SetResourceReference([Windows.Controls.TextBlock]::ForegroundProperty, "MainForegroundColor")
         [void]$dirsPanel.Children.Add($more)
@@ -208,7 +208,7 @@ function Show-WinUtilDiskAnalysis {
         $none = New-Object Windows.Controls.TextBlock
         $none.Text = "（当前目录内没有大于 50MB 的前 300 名文件）"
         $none.FontSize = 11.5
-        $none.FontStyle = [Windows.FontStyle]::Italic
+        $none.FontStyle = "Italic"
         $none.Margin = [Windows.Thickness]::new(2, 4, 0, 0)
         $none.SetResourceReference([Windows.Controls.TextBlock]::ForegroundProperty, "MainForegroundColor")
         [void]$filesPanel.Children.Add($none)

@@ -50,6 +50,7 @@ export default defineConfig({
 						{ label: 'Updates', slug: 'guides/updates' },
 						{ label: 'Automation', slug: 'guides/automation' },
 						{ label: 'Win11 Creator', slug: 'guides/win11creator' },
+						{ label: '装机体检与功能搜索', slug: 'guides/baseline' },
 					],
 				},
 				{

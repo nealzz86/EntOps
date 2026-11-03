@@ -207,7 +207,8 @@ function Show-CustomDialog {
         $hyperlink = New-Object Windows.Documents.Hyperlink
         $hyperlink.NavigateUri = New-Object System.Uri($match.Groups[1].Value)
         $hyperlink.Inlines.Add($match.Groups[2].Value)
-        $hyperlink.TextDecorations = [Windows.TextDecorations]::None  # Remove underline
+        # PowerShell 5.1 resolves [Windows.TextDecorations]::None to $null, so assign it directly.
+        $hyperlink.TextDecorations = $null  # Remove underline
         $hyperlink.Foreground = $LinkForegroundColor
 
         $hyperlink.Add_Click({

@@ -1,0 +1,125 @@
+﻿{
+  "meta": { "version": "1", "site": "本单位装机基线" },
+  "checks": [
+    {
+      "id": "computerName",
+      "type": "computerNamePattern",
+      "label": "计算机名符合命名规则",
+      "group": "基础信息",
+      "severity": "warn",
+      "expect": "PC-",
+      "hint": "计算机名应以 PC- 开头，便于资产系统对账；改名后需重启并通知信息部登记。",
+      "fix": { "button": "", "text": "" }
+    },
+    {
+      "id": "domainMode",
+      "type": "domain",
+      "label": "入网方式符合基线",
+      "group": "基础信息",
+      "severity": "info",
+      "expect": "workgroup",
+      "hint": "本单位装机默认工作组模式；已加入域的机器请与信息部核对域名后再确认此项。",
+      "fix": { "button": "", "text": "" }
+    },
+    {
+      "id": "timeZone",
+      "type": "timeZone",
+      "label": "系统时区为中国标准时间",
+      "group": "基础信息",
+      "severity": "warn",
+      "expect": "China Standard Time",
+      "hint": "时区错误会让共享目录时间戳与日志对不上，装机后应设为 China Standard Time。",
+      "fix": { "button": "", "text": "" }
+    },
+    {
+      "id": "powerScheme",
+      "type": "powerScheme",
+      "label": "电源计划为系统默认",
+      "group": "系统配置",
+      "severity": "warn",
+      "expect": "平衡",
+      "hint": "非常规电源计划多为装机残留，恢复默认计划后由系统统一管理节能策略。",
+      "fix": { "button": "WPFRemoveUltPerf", "text": "恢复默认电源计划" }
+    },
+    {
+      "id": "updatePolicy",
+      "type": "updatePolicy",
+      "label": "Windows 更新策略受控",
+      "group": "系统配置",
+      "severity": "warn",
+      "expect": "security",
+      "hint": "本单位要求更新受控、只安装安全更新，避免自动重启影响业务时段。",
+      "fix": { "button": "WPFUpdatessecurity", "text": "修复更新策略" }
+    },
+    {
+      "id": "defender",
+      "type": "defender",
+      "label": "Defender 实时防护已开启",
+      "group": "安全基线",
+      "severity": "fail",
+      "expect": "enabled",
+      "hint": "防护被关闭通常说明第三方杀软残留未清理，需先清理再确认 Defender 接管。",
+      "fix": { "button": "", "text": "" }
+    },
+    {
+      "id": "avClean",
+      "type": "avClean",
+      "label": "无第三方杀软残留",
+      "group": "安全基线",
+      "severity": "fail",
+      "expect": "clean",
+      "hint": "360、金山毒霸、腾讯电脑管家与公司镜像组件冲突，装机阶段必须清理干净。",
+      "fix": { "button": "WPFEntCleanDetect", "text": "检测残留杀软" }
+    },
+    {
+      "id": "remoteManagement",
+      "type": "service",
+      "label": "远程管理服务就绪",
+      "group": "远程运维",
+      "severity": "info",
+      "expect": "Running",
+      "hint": "WinRM 未开启时，信息部改走向日葵企业版提供远程协助。",
+      "fix": { "button": "WPFInstallSunlogin", "text": "安装向日葵企业版" }
+    },
+    {
+      "id": "requiredSoftware",
+      "type": "softwareInstalled",
+      "label": "必装软件已安装",
+      "group": "软件交付",
+      "severity": "warn",
+      "expect": "WPS Office,微信,向日葵",
+      "hint": "办公软件与远程协助工具应在装机阶段一次装齐，避免上线后逐个补装。",
+      "fix": { "button": "WPFInstall", "text": "安装必装软件" }
+    },
+    {
+      "id": "shareAccess",
+      "type": "shareReachable",
+      "label": "共享目录可访问",
+      "group": "网络共享",
+      "severity": "warn",
+      "expect": "true",
+      "hint": "共享目录用于取用驱动、单据模板与打印机配置，不可达时先映射网络驱动器。",
+      "fix": { "button": "WPFShareMapOnly", "text": "映射共享目录" }
+    },
+    {
+      "id": "systemDriveSpace",
+      "type": "freeSpace",
+      "label": "系统盘剩余空间充足",
+      "group": "存储",
+      "severity": "warn",
+      "expect": 20,
+      "hint": "系统盘剩余空间过小会导致更新与日志写入失败，需清理临时文件与旧版本缓存。",
+      "fix": { "button": "WPFDiskClean", "text": "清理系统盘" }
+    },
+    {
+      "id": "adminRights",
+      "type": "adminRequired",
+      "label": "以管理员身份运行",
+      "group": "运行环境",
+      "severity": "fail",
+      "expect": "true",
+      "hint": "本工具需以管理员身份运行，否则体检中的修复项无法落盘。",
+      "fix": { "button": "", "text": "" }
+    }
+  ]
+}

@@ -1,0 +1,615 @@
+﻿{
+  "meta": {
+    "version": "1"
+  },
+  "commands": [
+    {
+      "button": "WPFOverviewRefresh",
+      "label": "刷新",
+      "group": "概览",
+      "tab": "WPFTab9BT",
+      "keywords": "刷新 概览 状态 重载 设备信息 重新加载",
+      "action": "run"
+    },
+    {
+      "button": "WPFTab9BT",
+      "label": "概览",
+      "group": "概览",
+      "tab": "WPFTab9BT",
+      "keywords": "首页 总览 状态 设备 信息 入口",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoInstall",
+      "label": "安装软件",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "装机 安装 软件 应用 商店 批量",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoTweaks",
+      "label": "系统优化",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "优化 调优 预设 精简  tweaks 设置",
+      "action": "goto"
+    },
+    {
+      "button": "WPFTab3BT",
+      "label": "功能配置",
+      "group": "功能配置",
+      "tab": "WPFTab3BT",
+      "keywords": "功能 组件 配置 超管理 hyperv wsl 控制面板 系统组件",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoUpdates",
+      "label": "更新管理",
+      "group": "更新",
+      "tab": "WPFTab4BT",
+      "keywords": "更新 windows update 补丁 策略 延后",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoISO",
+      "label": "制作镜像",
+      "group": "镜像制作",
+      "tab": "WPFTab5BT",
+      "keywords": "镜像 iso u盘 启动盘 装机 重装 系统盘",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoPrinter",
+      "label": "打印共享",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "打印机 共享 小票 票据 打印 网段",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoClean",
+      "label": "安全清理",
+      "group": "安全清理",
+      "tab": "WPFTab8BT",
+      "keywords": "清理 垃圾 残留 流氓软件 缓存 卸载",
+      "action": "goto"
+    },
+    {
+      "button": "WPFTab10BT",
+      "label": "磁盘分析",
+      "group": "磁盘分析",
+      "tab": "WPFTab10BT",
+      "keywords": "磁盘 空间 占用 大文件 目录 分析 容量",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoNet",
+      "label": "网络诊断",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "网络 诊断 排障 测速 网卡 抓包",
+      "action": "goto"
+    },
+    {
+      "button": "WPFOverviewGoBaseline",
+      "label": "装机体检",
+      "group": "装机体检",
+      "tab": "WPFTab12BT",
+      "keywords": "体检 基线 装机 检查 验收 环境",
+      "action": "goto"
+    },
+    {
+      "button": "WPFBaselineRun",
+      "label": "开始体检",
+      "group": "装机体检",
+      "tab": "WPFTab12BT",
+      "keywords": "体检 基线 巡检 报告 检查 合规",
+      "action": "run"
+    },
+    {
+      "button": "WPFInstall",
+      "label": "安装/升级所选应用",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "安装 装机 升级 应用 软件 批量 winget",
+      "action": "run"
+    },
+    {
+      "button": "WPFUninstall",
+      "label": "卸载所选应用",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "卸载 删除 移除 软件 应用 清理",
+      "action": "run"
+    },
+    {
+      "button": "WPFInstallUpgrade",
+      "label": "升级全部应用",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "升级 更新 全量 应用 版本 软件",
+      "action": "run"
+    },
+    {
+      "button": "WPFCollapseAllCategories",
+      "label": "收起全部分类",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "收起 折叠 分类 列表 全部",
+      "action": "run"
+    },
+    {
+      "button": "WPFExpandAllCategories",
+      "label": "展开全部分类",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "展开 分类 列表 全部 软件",
+      "action": "run"
+    },
+    {
+      "button": "WPFClearInstallSelection",
+      "label": "清空选择",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "清空 取消 选择 勾选 应用 重置",
+      "action": "run"
+    },
+    {
+      "button": "WPFGetInstalled",
+      "label": "获取已安装",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "已安装 检测 扫描 应用 软件 清单",
+      "action": "run"
+    },
+    {
+      "button": "WPFInstallSunlogin",
+      "label": "向日葵企业版（SOS）",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "向日葵 远程 控制 协助 贝锐 sos 运维",
+      "action": "run"
+    },
+    {
+      "button": "WPFInstallMeituanPOS",
+      "label": "美团收银（门店版）",
+      "group": "软件安装",
+      "tab": "WPFTab1BT",
+      "keywords": "美团 收银 门店 pos 点单 外卖",
+      "action": "run"
+    },
+    {
+      "button": "WPFAppxRemoval",
+      "label": "AppX 移除",
+      "group": "AppX 移除",
+      "tab": "WPFTab6BT",
+      "keywords": "appx 预装 内置 应用 移除 卸载 商店",
+      "action": "run"
+    },
+    {
+      "button": "WPFDefaultAppxSelection",
+      "label": "默认",
+      "group": "AppX 移除",
+      "tab": "WPFTab6BT",
+      "keywords": "默认 选择 勾选 appx 预装 移除",
+      "action": "run"
+    },
+    {
+      "button": "WPFGetInstalledAppx",
+      "label": "获取已安装项",
+      "group": "AppX 移除",
+      "tab": "WPFTab6BT",
+      "keywords": "已安装 检测 勾选 appx 预装 内置",
+      "action": "run"
+    },
+    {
+      "button": "WPFInstallSelectedAppx",
+      "label": "安装所选项",
+      "group": "AppX 移除",
+      "tab": "WPFTab6BT",
+      "keywords": "安装 恢复 appx 预装 内置 商店",
+      "action": "run"
+    },
+    {
+      "button": "WPFRemoveSelectedAppx",
+      "label": "移除所选项",
+      "group": "AppX 移除",
+      "tab": "WPFTab6BT",
+      "keywords": "移除 卸载 appx 预装 内置 商店",
+      "action": "run"
+    },
+    {
+      "button": "WPFBackToTweaks",
+      "label": "返回优化",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "返回 优化 系统优化 上一页 切换",
+      "action": "run"
+    },
+    {
+      "button": "WPFStandard",
+      "label": "标准",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "标准 预设 推荐 优化 通用",
+      "action": "run"
+    },
+    {
+      "button": "WPFMinimal",
+      "label": "最小化",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "最小化 保守 预设 优化 少量",
+      "action": "run"
+    },
+    {
+      "button": "WPFAdvanced",
+      "label": "高级",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "高级 激进 预设 全部 优化",
+      "action": "run"
+    },
+    {
+      "button": "WPFClearTweaksSelection",
+      "label": "清除",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "清除 取消 勾选 优化 重置 预设",
+      "action": "run"
+    },
+    {
+      "button": "WPFGetInstalledTweaks",
+      "label": "获取已安装优化",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "已安装 检测 状态 导入 优化",
+      "action": "run"
+    },
+    {
+      "button": "WPFtweaksbutton",
+      "label": "执行优化",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "执行 应用 优化 调优 提交 生效",
+      "action": "run"
+    },
+    {
+      "button": "WPFundoall",
+      "label": "撤销所选优化",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "撤销 恢复 还原 回滚 优化 反悔",
+      "action": "run"
+    },
+    {
+      "button": "WPFOOSUbutton",
+      "label": "运行 O&O ShutUp10++",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "隐私 遥测 跟踪 shutup 关闭 服务",
+      "action": "run"
+    },
+    {
+      "button": "WPFAddUltPerf",
+      "label": "添加并启用“卓越性能”电源计划",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "卓越性能 电源 计划 高性能 提速 电源方案",
+      "action": "run"
+    },
+    {
+      "button": "WPFRemoveUltPerf",
+      "label": "移除“卓越性能”电源计划",
+      "group": "系统优化",
+      "tab": "WPFTab2BT",
+      "keywords": "移除 卓越性能 电源 计划 恢复 默认",
+      "action": "run"
+    },
+    {
+      "button": "WPFUpdatessecurity",
+      "label": "应用推荐设置",
+      "group": "更新",
+      "tab": "WPFTab4BT",
+      "keywords": "更新 推荐 延后 补丁 安全 windows update",
+      "action": "run"
+    },
+    {
+      "button": "WPFUpdatesdefault",
+      "label": "恢复默认设置",
+      "group": "更新",
+      "tab": "WPFTab4BT",
+      "keywords": "更新 默认 恢复 交还 撤销 windows update",
+      "action": "run"
+    },
+    {
+      "button": "WPFUpdatesdisable",
+      "label": "禁用更新",
+      "group": "更新",
+      "tab": "WPFTab4BT",
+      "keywords": "禁用 关闭 停止 更新 断更 windows update",
+      "action": "run"
+    },
+    {
+      "button": "WPFPrinterInstall",
+      "label": "开始安装打印机",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "打印机 安装 连接 共享 驱动 针式",
+      "action": "run"
+    },
+    {
+      "button": "WPFPrinterFormColorOnly",
+      "label": "仅设置纸张与颜色",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "打印机 纸张 易快报 尺寸 黑白 颜色 重设 已安装",
+      "action": "run"
+    },
+    {
+      "button": "WPFShareMapOnly",
+      "label": "映射共享文件夹",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "共享 文件夹 映射 网络驱动器 盘符 目录",
+      "action": "run"
+    },
+    {
+      "button": "WPFEntCfgAddPrinter",
+      "label": "新增打印机配置",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "打印机 新增 添加 配置 自定义 本机",
+      "action": "run"
+    },
+    {
+      "button": "WPFEntCfgAddShare",
+      "label": "新增共享文件夹配置",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "共享 文件夹 新增 添加 配置 盘符 自定义",
+      "action": "run"
+    },
+    {
+      "button": "WPFEntCfgSave",
+      "label": "保存本机打印与共享配置",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "保存 配置 打印机 共享 本机 自定义 生效",
+      "action": "run"
+    },
+    {
+      "button": "WPFEntCfgReset",
+      "label": "恢复内置打印与共享配置",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "恢复 重置 删除 本机 配置 内置 默认 打印机 共享",
+      "action": "run"
+    },
+    {
+      "button": "WPFReceiptScan",
+      "label": "搜索网段内的打印机",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "扫描 搜索 网段 打印机 ip 小票",
+      "action": "run"
+    },
+    {
+      "button": "WPFReceiptSetXp",
+      "label": "修改芯烨打印机 IP",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "芯烨 xp 打印机 修改 地址 小票 针式",
+      "action": "run"
+    },
+    {
+      "button": "WPFReceiptEpsonWeb",
+      "label": "打开爱普生网页配置",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "爱普生 epson 网页 配置 后台 地址 打印机",
+      "action": "run"
+    },
+    {
+      "button": "WPFReceiptSyncPort",
+      "label": "同步本机打印端口到新 IP",
+      "group": "打印共享",
+      "tab": "WPFTab7BT",
+      "keywords": "端口 同步 打印机 变更 重定向 映射",
+      "action": "run"
+    },
+    {
+      "button": "WPFDiskScan",
+      "label": "扫描垃圾占用",
+      "group": "安全清理",
+      "tab": "WPFTab8BT",
+      "keywords": "扫描 垃圾 占用 缓存 临时文件 磁盘",
+      "action": "run"
+    },
+    {
+      "button": "WPFDiskClean",
+      "label": "清理勾选项",
+      "group": "安全清理",
+      "tab": "WPFTab8BT",
+      "keywords": "清理 删除 垃圾 缓存 释放 空间",
+      "action": "run"
+    },
+    {
+      "button": "WPFEntCleanDetect",
+      "label": "检测安装状态",
+      "group": "安全清理",
+      "tab": "WPFTab8BT",
+      "keywords": "检测 状态 360 毒霸 电脑管家 金山 腾讯",
+      "action": "run"
+    },
+    {
+      "button": "WPFEntCleanRun",
+      "label": "开始彻底清理",
+      "group": "安全清理",
+      "tab": "WPFTab8BT",
+      "keywords": "清理 卸载 残留 360 毒霸 电脑管家 杀毒",
+      "action": "run"
+    },
+    {
+      "button": "WPFDiskAnaScan",
+      "label": "开始全盘扫描",
+      "group": "磁盘分析",
+      "tab": "WPFTab10BT",
+      "keywords": "扫描 磁盘 空间 占用 大文件 目录",
+      "action": "run"
+    },
+    {
+      "button": "WPFDiskAnaUp",
+      "label": "上一级",
+      "group": "磁盘分析",
+      "tab": "WPFTab10BT",
+      "keywords": "上一级 返回 上层 目录 浏览 磁盘",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetHealthRefresh",
+      "label": "刷新总览",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "刷新 总览 健康 状态 网络 概览",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetPing",
+      "label": "Ping 测试",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "ping 连通 测试 延迟 丢包 主机",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetTrace",
+      "label": "路由追踪",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "路由 追踪 跳转 节点 延迟 tracert",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetPortScan",
+      "label": "端口扫描",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "端口 扫描 开放 tcp 检测 主机",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetSession",
+      "label": "并发会话测试",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "并发 会话 连接 数量 压测 端口",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetWan",
+      "label": "外网测速",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "外网 测速 带宽 限速 上行 下载 速度",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetResolve",
+      "label": "DNS 解析",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "解析 域名 记录 指向 查询 dns",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetDnsBenchmark",
+      "label": "DNS 测速",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "测速 服务器 对比 响应 基准 dns",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetPorts",
+      "label": "本机端口占用",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "端口 占用 监听 本机 进程  netstat",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetHosts",
+      "label": "主机发现",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "主机 发现 存活 网段 扫描 arp",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetCamera",
+      "label": "摄像头/IPC 扫描",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "摄像头 监控 录像机 扫描 ipc onvif",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetDhcp",
+      "label": "DHCP 检测",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "地址 分配 服务器 租约 检测 dhcp",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetAudit",
+      "label": "本机安全自测",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "安全 自测 审计 检查 本机 端口",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetLan",
+      "label": "内网共享测速",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "内网 共享 测速 传输 文件 带宽",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetEvents",
+      "label": "网络事件日志",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "事件 日志 断开 记录 报错 网络",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetPktStart",
+      "label": "开始抓包",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "抓包 捕获 报文 流量 开始 pktmon",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetPktStop",
+      "label": "停止并分析",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "停止 抓包 分析 报文 流量",
+      "action": "run"
+    },
+    {
+      "button": "WPFFNetPktOpen",
+      "label": "打开抓包目录",
+      "group": "网络诊断",
+      "tab": "WPFTab11BT",
+      "keywords": "打开 抓包 目录 文件夹 导出 文件",
+      "action": "run"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 <#
 .NOTES
     工具         : 企业运维工具（EntOps）
-    二次开发     : https://github.com/nealzz86
-    上游项目     : https://github.com/ChrisTitusTech/winutil
+    定位         : 内部 IT 运维工具
+    上游项目     : Chris Titus Tech winutil（MIT 许可）
     Version      : #{replaceme}
 #>
 

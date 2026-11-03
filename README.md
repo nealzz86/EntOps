@@ -53,6 +53,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Build-Exe.ps1
 合并规则写在 `Compile.ps1`：同名键覆盖，**数组整体替换**，所以覆盖文件里要写完整的那一段。打印共享页的机器名、
 IP、位置、共享盘符与账号全部来自配置，界面代码里不保留任何现场信息。
 
+现场改配置优先用界面：打印共享页底部的「本机打印与共享配置」能直接增删改打印机与共享文件夹（数量不限），
+保存写入 `%LOCALAPPDATA%\winutil\entprinters.user.json`——只有这一台电脑生效、不进版本库、程序升级也不会被覆盖，
+「恢复内置配置」删掉该文件即可回到编译时内嵌的那份。保存前会校验（IP、UNC 路径、盘符、纸张尺寸、纸名长度），
+不通过就不落盘。启动时 `Update-WinUtilEntPrinterConfig` 读这个文件，读不懂就退回内置配置，不会把打印带走。
+凭据仍是明文存在本机，公用电脑不要在里面存密码。
+
 打印机驱动包（`driver.zip`、`driver2.zip`，约 60 MB）属于厂商分发物，不入库；需要离线安装时把它们放进
 `drivers\`（或 `driver\`）目录，与 `EntOps.ps1`/exe 同级即可被识别。
 

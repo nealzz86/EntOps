@@ -1,7 +1,7 @@
 Write-Host @"
 
  ===== 企业运维工具 (EntOps) =====
- 基于 github.com/nealzz86 二次开发
+ 内部 IT 运维工具
  上游项目: Chris Titus Tech winutil
 
 "@
@@ -26,6 +26,11 @@ $sync.configs.appxHashtable = @{}
 $sync.configs.appx.PSObject.Properties | ForEach-Object {
     $sync.configs.appxHashtable[$_.Name] = $_.Value
 }
+
+# Printers and shares are the one configuration an operator edits on the machine itself, so the
+# per-machine file in the user profile is applied here, once, before anything reads the config.
+# Every consumer keeps reading $sync.configs.entprinters and never needs to know a file exists.
+Update-WinUtilEntPrinterConfig | Out-Null
 $sync.preferences.theme = "Auto"
 $sync.preferences.packagemanager = "Winget"
 
