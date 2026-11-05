@@ -1,5 +1,6 @@
 ﻿param (
-    [switch]$Run
+    [switch]$Run,
+    [switch]$NoSiteOverlay
 )
 
 # Field credentials belong to config\<name>.local.json, which never enters the repository. Scanning
@@ -55,7 +56,13 @@ Get-ChildItem config -File | Where-Object { $_.Name -notlike "*.local.json" } | 
     }
 
     $overlayPath = Join-Path $_.DirectoryName "$($_.BaseName).local.json"
-    if (Test-Path -LiteralPath $overlayPath) {
+    if ($NoSiteOverlay) {
+        # The public build ships the templates only. Skip the merge, and check the finished script
+        # afterwards - the intent is not the evidence, the artifact is.
+        if (Test-Path -LiteralPath $overlayPath) {
+            Write-Output "   公开构建：跳过 $($_.BaseName).local.json"
+        }
+    } elseif (Test-Path -LiteralPath $overlayPath) {
         $obj = Merge-WinUtilConfigValue -Base $obj -Overlay (Get-Content -LiteralPath $overlayPath -Raw -Encoding UTF8 | ConvertFrom-Json)
         Write-Output "   合入本地覆盖配置 $($_.BaseName).local.json"
     }
@@ -75,6 +82,15 @@ $script += "`$WinUtilAutounattendXml = @'`r`n$autounattendXml`r`n'@"
 $script += Get-Content -Path scripts\main.ps1 -Raw -Encoding UTF8
 
 Set-Content -Path winutil.ps1 -Value $script -Encoding UTF8
+
+if ($NoSiteOverlay) {
+    # Re-run the scan against the file that is about to leave this machine: a credential that
+    # reached the product by any other route (a hard-coded default, a pasted label) fails here.
+    & (Join-Path -Path $PSScriptRoot -ChildPath "lint\SecretScan.ps1") -ArtifactPath (Join-Path -Path $PSScriptRoot -ChildPath "winutil.ps1")
+    if ($LASTEXITCODE -ne 0) {
+        throw "公开构建的产物里存在现场凭据，已停止。"
+    }
+}
 
 if ($Run) {
     .\Winutil.ps1

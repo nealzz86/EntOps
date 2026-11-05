@@ -23,7 +23,12 @@
 #>
 
 param(
-    [string]$Path = (Split-Path -Parent $PSScriptRoot)
+    [string]$Path = (Split-Path -Parent $PSScriptRoot),
+    # A build product to check in addition to the tracked tree. The product is *supposed* to carry
+    # the site's accounts, so the extension and size rules do not apply to it - only the value
+    # comparison does. Pass it when a build is meant to leave the machine, to prove that it does
+    # not carry those values.
+    [string]$ArtifactPath
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,7 +48,7 @@ $forbiddenTracked = @(
 $scannable = @(".ps1", ".psm1", ".json", ".xaml", ".xml", ".md", ".yaml", ".yml", ".bat", ".cmd", ".txt")
 
 # Values that mean "filled in by the site, not a real secret"
-$placeholders = @("", "change_me", "changeme", "placeholder", "example", "password", "enterpasswordhere", "示例", "占位", "样例", "<")
+$placeholders = @("change_me", "changeme", "placeholder", "example", "password", "enterpasswordhere", "示例", "占位", "样例", "<")
 
 # Only values sitting under a site-specific key count. Walking into every string would report
 # driver filenames and other ordinary configuration as if they were secrets.
@@ -162,6 +167,25 @@ foreach ($secret in $secretValues) {
     }
 }
 
+if ($ArtifactPath) {
+    # An overlay that is missing or renamed yields zero values, and a value comparison against
+    # nothing passes silently. Treat that as a failure: the check exists to prove a build is clean.
+    if ($secretValues.Count -eq 0) {
+        $problems.Add("没有从 config\\*.local.json 读到任何现场凭据值，无法证明产物『$ArtifactPath』不含它们")
+    } elseif (-not (Test-Path -LiteralPath $ArtifactPath -PathType Leaf)) {
+        $problems.Add("指定的产物不存在，无法检查：$ArtifactPath")
+    } else {
+        $artifactText = Get-Content -LiteralPath $ArtifactPath -Raw -Encoding UTF8
+        $leaked = @($secretValues | Where-Object { $artifactText.Contains($_.Value) })
+        foreach ($secret in $leaked) {
+            $problems.Add("现场凭据出现在产物里：$([IO.Path]::GetFileName($ArtifactPath))（来自 $($secret.Where) 的值）")
+        }
+        if ($leaked.Count -eq 0) {
+            Write-Output "   产物脱敏检查通过：$([IO.Path]::GetFileName($ArtifactPath)) 未命中 $($secretValues.Count) 个现场值。"
+        }
+    }
+}
+
 # A credential field left filled in inside a committed config means the template itself leaked
 foreach ($config in @($scannableTracked | Where-Object { $_ -like "config/*.json" })) {
     $obj = Get-Content -LiteralPath $config -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -186,6 +210,8 @@ foreach ($config in @($scannableTracked | Where-Object { $_ -like "config/*.json
             if ($p.Name -notmatch '^(Pass|Password|Passwd|Secret|Token|UserCode|colorUserCode)$') { continue }
 
             $text = if ($null -eq $p.Value) { "" } else { [string]$p.Value }
+            # An empty field is the template's shape; only a filled-in one can be a real credential.
+            if ($text.Trim().Length -eq 0) { continue }
             $isPlaceholder = @($placeholders | Where-Object { $text -like "*$_*" }).Count -gt 0
             if (-not $isPlaceholder) {
                 $problems.Add("已提交的配置里写了真实凭据：$($current.Where).$($p.Name)，请改成空字符串并移到 *.local.json")

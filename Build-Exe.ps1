@@ -20,14 +20,22 @@ param(
     [string]$ReleaseDir = "D:\打印\企业运维工具",
     [string]$ExeName = "企业运维工具.exe",
     [string]$Title = "企业运维工具",
-    [string]$IconFile = "$PSScriptRoot\assets\entops-icon.ico"
+    [string]$IconFile = "$PSScriptRoot\assets\entops-icon.ico",
+    # Pass through to Compile.ps1: the build that leaves this machine must not carry the site's
+    # share accounts. Without it this script always embeds the local overlay and overwrites
+    # winutil.ps1 with a credential-bearing copy.
+    [switch]$NoSiteOverlay
 )
 
 $ErrorActionPreference = "Stop"
 Set-Location -LiteralPath $PSScriptRoot
 
 Write-Output "== 编译 winutil.ps1"
-& .\Compile.ps1
+if ($NoSiteOverlay) {
+    & .\Compile.ps1 -NoSiteOverlay
+} else {
+    & .\Compile.ps1
+}
 
 $compiled = Get-Content -LiteralPath "$PSScriptRoot\winutil.ps1" -Raw
 $version = [regex]::Match($compiled, '\$sync\.version = "([^"]+)"').Groups[1].Value
