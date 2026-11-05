@@ -331,7 +331,8 @@ Describe "XAML document" {
             "WPFTab9:概览",
             "WPFTab10:磁盘分析",
             "WPFTab11:网络诊断",
-            "WPFTab12:装机体检"
+            "WPFTab12:装机体检",
+            "WPFTab13:打印与共享设置"
         )
 
         if (@($actualTabs).Count -ne $expectedTabs.Count) {
@@ -433,8 +434,8 @@ Describe "XAML document" {
         # chips can restyle the dropdown button through an implicit lookup
         $comboToggle.GetAttribute("Style") | Should -Be "{StaticResource ComboBoxToggleButtonStyle}"
         $comboItemStyle | Should -Not -BeNullOrEmpty
-        # Twelve pages, but AppX is reached from the removal button instead of the nav rail
-        $navButtons.Count | Should -Be 11
+        # Thirteen pages, but AppX is reached from the removal button instead of the nav rail
+        $navButtons.Count | Should -Be 12
         foreach ($navButton in $navButtons) {
             $navButton.GetAttribute("Style") | Should -Be "{StaticResource NavItemToggleStyle}"
         }

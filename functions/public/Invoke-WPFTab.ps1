@@ -50,6 +50,7 @@ function Invoke-WPFTab {
             9 { "DiskAna" }
             10 { "NetDiag" }
             11 { "Baseline" }
+            12 { "EntPrinterSettings" }
             default { $sync.WPFTabNav.Items[$tabNumber].Header }
         }
 
@@ -61,12 +62,13 @@ function Invoke-WPFTab {
             "Updates"  { @("更新管理", "Windows 更新策略与离线更新") }
             "Win11ISO" { @("Win10/11 镜像制作", "官方 ISO 验证、修改与写出") }
             "AppX"     { @("AppX 移除", "选择要移除的预装应用包") }
-            "PrintShare" { @("打印共享", "共享打印机连接与信息部排障") }
+            "PrintShare" { @("打印共享", "装打印机、映射共享与门店小票网口配置") }
             "EntClean" { @("安全清理", "360/毒霸/电脑管家残留彻底清理") }
             "Overview" { @("概览", "设备状态与常用入口") }
             "DiskAna"  { @("磁盘分析", "磁盘空间占用下钻与大文件定位") }
             "NetDiag"  { @("网络诊断", "连通性、扫描、测速与抓包分析") }
             "Baseline" { @("装机体检", "按本单位基线逐项核对，点不合格项直接修复") }
+            "EntPrinterSettings" { @("打印与共享设置", "本机打印机与共享文件夹的增删改，保存后只影响这台电脑") }
             default    { @([string]$sync.WPFTabNav.Items[$tabNumber].Header, "") }
         }
         if ($sync.ContainsKey("WPFPageTitle") -and $sync.WPFPageTitle) {

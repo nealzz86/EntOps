@@ -211,9 +211,9 @@ function Install-WinUtilPrinter {
     if (-not (Set-WinUtilPrinterPaperAndColor -Printer $Printer)) {
         Write-Host "  [警告] 易快报纸张配置失败，但打印机已安装成功。"
     } else {
-        Write-Host "  [5/6] 易快报打印模式配置完成。"
+        Write-Host "  [5/6] 易快报打印模式已提交，实际生效情况见上面的回读结果。"
     }
-    Step-WinUtilJob -Status "5/6 · 纸张配置完成" -Percent 83
+    Step-WinUtilJob -Status "5/6 · 纸张与颜色已提交" -Percent 83
 
     # ---------- [6/6] 传统打印对话框 ----------
     Step-WinUtilJob -Status "6/6 · 启用传统打印对话框…" -Percent 83
@@ -241,9 +241,9 @@ function Install-WinUtilPrinter {
     Write-Host "用户代码  ：$(if ($UserCode) { $UserCode } else { '（无）' })"
     Write-Host ""
     Write-Host "【使用提示】"
-    Write-Host "1. 已启用传统打印对话框，打印时纸张下拉框应显示「$($cfg.formName)」"
-    Write-Host "2. 如仍看不到，请在打印对话框选择「自定义纸张尺寸」→ 输入 140×240mm"
-    Write-Host "3. 黑白打印机已强制设置为黑白模式"
+    Write-Host "1. 已启用传统打印对话框；纸张与颜色的实际生效情况以上面的回读结果为准"
+    Write-Host "2. 驱动没采纳这张纸时，在打印对话框选「自定义纸张尺寸」→ 手动输入 $([int]($cfg.formWidthTenthMm / 10))×$([int]($cfg.formHeightTenthMm / 10))mm"
+    Write-Host "3. 黑白打印机已按黑白模式提交，回读若仍显示彩色说明这台设备的驱动不认队列默认值"
     Write-Host "4. 本次只装打印机，共享文件夹请用「映射共享文件夹」单独执行"
     Write-Host "如有问题，请联系信息部，谢谢！"
     Write-Host "======================================================"

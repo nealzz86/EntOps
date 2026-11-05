@@ -166,6 +166,23 @@ Describe "Startup lazy tab wiring" {
         $tabScript | Should -Match 'Initialize-WinUtilTabContent -TabName \$sync\.currentTab'
     }
 
+    It "gives every sidebar page an English key and a page header" {
+        # A page missing from either switch still opens, but falls through to the localized Header
+        # as its currentTab key and shows an empty subtitle: content initialization, render gating
+        # and search filtering all compare that value against English keys, so it silently stops
+        # matching and the page comes up blank.
+        $tabScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFTab.ps1") -Raw
+        [xml] $doc = Get-Content -LiteralPath (Join-Path $script:repoRoot "xaml\inputXML.xaml") -Raw -Encoding UTF8
+        $navNumbers = @([regex]::Matches($doc.OuterXml, 'Name="WPFTab(\d+)BT"') | ForEach-Object { [int]$_.Groups[1].Value - 1 } | Sort-Object -Unique)
+
+        $navNumbers.Count | Should -BeGreaterThan 0
+        foreach ($number in $navNumbers) {
+            $key = [regex]::Match($tabScript, "(?m)^\s*$number\s*\{\s*`"([A-Za-z0-9]+)`"\s*\}")
+            $key.Success | Should -BeTrue -Because "tab $number 需要一个英文 currentTab 键，不能落到 default 分支"
+            $tabScript | Should -Match "`"$($key.Groups[1].Value)`"\s+\{\s*@\(" -Because "页面 $($key.Groups[1].Value) 应有顶部标题"
+        }
+    }
+
     It "binds generated button clicks when lazy panels are rendered" {
         $rendererScript = Get-Content -Path (Join-Path $script:repoRoot "functions\public\Invoke-WPFUIElements.ps1") -Raw
         $mainScript = Get-Content -Path (Join-Path $script:repoRoot "scripts\main.ps1") -Raw

@@ -1125,6 +1125,12 @@
                             <TextBlock Text="打印共享" VerticalAlignment="Center" Background="Transparent" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"/>
                         </StackPanel>
                     </ToggleButton>
+                    <ToggleButton Name="WPFTab13BT" Style="{StaticResource NavItemToggleStyle}">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
+                            <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="15" VerticalAlignment="Center" Margin="2,0,14,0" Background="Transparent" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"/>
+                            <TextBlock Text="打印与共享设置" VerticalAlignment="Center" Background="Transparent" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"/>
+                        </StackPanel>
+                    </ToggleButton>
                     <ToggleButton Name="WPFTab8BT" Style="{StaticResource NavItemToggleStyle}">
                         <StackPanel Orientation="Horizontal" Background="Transparent">
                             <TextBlock Text="&#xE74C;" FontFamily="Segoe MDL2 Assets" FontSize="15" VerticalAlignment="Center" Margin="2,0,14,0" Background="Transparent" Foreground="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type ToggleButton}}}"/>
@@ -2371,7 +2377,7 @@
                                 <TextBlock Text="打印机一键安装（信息部）"
                                            FontSize="20" FontWeight="Bold"
                                            Foreground="{DynamicResource MainForegroundColor}"/>
-                                <TextBlock Text="选择打印机后点击安装，自动完成：建端口 → 释放驱动 → 装驱动 → 加打印机 → 易快报打印模式（自定义纸张）→ 传统打印对话框。共享文件夹不在此流程，请用下方「映射共享文件夹」单独执行。打印机数量不固定，在下方「本机打印与共享配置」里增删。"
+                                <TextBlock Text="选择打印机后点击安装，自动执行：建端口 → 释放驱动 → 装驱动 → 加打印机 → 易快报打印模式（自定义纸张）→ 传统打印对话框；纸张与颜色是否被驱动采纳，以运行后的回读结果为准。共享文件夹不在此流程，请用下方「映射共享文件夹」单独执行。打印机数量不固定，在左侧「打印与共享设置」页里增删。"
                                            Margin="0,6,0,10" FontSize="13" TextWrapping="Wrap"
                                            Foreground="{DynamicResource MainForegroundColor}"/>
                                 <!-- 打印机单选项按配置条数在这里生成，界面 markup 不写死数量 -->
@@ -2417,7 +2423,7 @@
                                 <TextBlock Text="共享文件夹映射"
                                            FontSize="20" FontWeight="Bold"
                                            Foreground="{DynamicResource MainForegroundColor}"/>
-                                <TextBlock Text="勾选需要的共享后单独执行；与打印机安装互不影响，可重复运行，已映射的会自动跳过。共享数量不固定，在下方「本机打印与共享配置」里增删。"
+                                <TextBlock Text="勾选需要的共享后单独执行；与打印机安装互不影响，可重复运行，已映射的会自动跳过。共享数量不固定，在左侧「打印与共享设置」页里增删。"
                                            Margin="0,6,0,10" FontSize="13" TextWrapping="Wrap"
                                            Foreground="{DynamicResource MainForegroundColor}"/>
                                 <!-- 共享勾选项同样按配置条数生成 -->
@@ -2428,60 +2434,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 本机打印与共享配置编辑器 -->
-                        <Border Style="{StaticResource BorderStyle}" Padding="16" Margin="5,5,5,10">
-                            <StackPanel>
-                                <TextBlock Text="本机打印与共享配置"
-                                           FontSize="20" FontWeight="Bold"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-                                <TextBlock Text="在这里增删改打印机与共享文件夹，保存后写入当前用户的配置目录，只影响这台电脑，程序升级也不会被覆盖。凭据以明文保存在本机，公用电脑请勿保存密码。留空密码表示匿名访问。"
-                                           Margin="0,6,0,10" FontSize="13" TextWrapping="Wrap"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                    <TextBlock Text="纸张名称" VerticalAlignment="Center" Width="90"
-                                               Foreground="{DynamicResource MainForegroundColor}"/>
-                                    <TextBox Name="WPFEntCfgFormName" Width="190" VerticalContentAlignment="Center" Margin="0,0,16,0"/>
-                                    <TextBlock Text="宽（mm）" VerticalAlignment="Center"
-                                               Foreground="{DynamicResource MainForegroundColor}"/>
-                                    <TextBox Name="WPFEntCfgFormWidth" Width="60" VerticalContentAlignment="Center" Margin="6,0,16,0"/>
-                                    <TextBlock Text="高（mm）" VerticalAlignment="Center"
-                                               Foreground="{DynamicResource MainForegroundColor}"/>
-                                    <TextBox Name="WPFEntCfgFormHeight" Width="60" VerticalContentAlignment="Center" Margin="6,0,16,0"/>
-                                    <TextBlock Text="彩色用户代码" VerticalAlignment="Center"
-                                               Foreground="{DynamicResource MainForegroundColor}"/>
-                                    <TextBox Name="WPFEntCfgColorCode" Width="110" VerticalContentAlignment="Center"/>
-                                </StackPanel>
-                                <TextBlock Text="纸张名称与尺寸对易快报打印模式生效；彩色用户代码留空表示彩色模式不带代码。"
-                                           FontSize="11" FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,8"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-
-                                <Separator Margin="0,4,0,6"/>
-                                <TextBlock Text="打印机" FontWeight="Bold" Margin="0,0,0,4"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-                                <StackPanel Name="WPFEntCfgPrinterRows"/>
-                                <Button Name="WPFEntCfgAddPrinter" Content="新增打印机" HorizontalAlignment="Left"
-                                        FontSize="{DynamicResource ConfigTabButtonFontSize}" Padding="14,6" Margin="0,6,0,0"/>
-
-                                <TextBlock Text="共享文件夹" FontWeight="Bold" Margin="0,14,0,4"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-                                <StackPanel Name="WPFEntCfgShareRows"/>
-                                <Button Name="WPFEntCfgAddShare" Content="新增共享文件夹" HorizontalAlignment="Left"
-                                        FontSize="{DynamicResource ConfigTabButtonFontSize}" Padding="14,6" Margin="0,6,0,0"/>
-
-                                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
-                                    <Button Name="WPFEntCfgSave" Content="保存配置"
-                                            FontSize="{DynamicResource ConfigTabButtonFontSize}"
-                                            Margin="0,0,10,0" Padding="16,8"/>
-                                    <Button Name="WPFEntCfgReset" Content="恢复内置配置"
-                                            FontSize="{DynamicResource ConfigTabButtonFontSize}" Padding="16,8"/>
-                                </StackPanel>
-                                <TextBlock Name="WPFEntCfgSource" Text="" FontSize="11" FontStyle="Italic" Margin="0,8,0,0" TextWrapping="Wrap"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-                                <TextBlock Name="WPFEntCfgStatus" Text="" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"
-                                           Foreground="{DynamicResource MainForegroundColor}"/>
-                            </StackPanel>
-                        </Border>
 
                         <!-- 门店小票打印机网口配置 -->
                         <Border Style="{StaticResource BorderStyle}" Padding="16" Margin="5,5,5,10">
@@ -2532,8 +2484,8 @@
 
                         <Border Style="{StaticResource BorderStyle}" Margin="5,5,5,5">
                             <TextBlock Padding="10" TextWrapping="Wrap" Foreground="{DynamicResource MainForegroundColor}">
-                                说明：黑白打印机已强制设置为黑白模式；已启用传统打印对话框，打印时纸张下拉框应显示「易快报打印模式」。
-                                <LineBreak/>如打印首选项看不到自定义纸张，请在应用中选择「自定义纸张尺寸」手动输入 140×240mm。
+                                说明：本工具会登记自定义纸张、按配置提交黑白模式并启用传统打印对话框；完成后画面会回读驱动实际生效的纸张与颜色，以回读结果为准。
+                                <LineBreak/>若提示驱动没有采纳这张自定义纸（通用 V4 驱动的常见限制），请在业务软件的打印设置里选「自定义纸张尺寸」，按上面配置的宽高手动输入。
                                 <LineBreak/>驱动包 driver.zip / driver2.zip 需放在脚本同级的 drivers 文件夹中。如有问题请联系信息部。
                             </TextBlock>
                         </Border>
@@ -3552,6 +3504,68 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="打印与共享设置" Visibility="Collapsed" Name="WPFTab13">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="{DynamicResource TabContentMargin}">
+                    <StackPanel Background="Transparent" MaxWidth="1100" HorizontalAlignment="Stretch">
+
+                        <!-- 本机打印与共享配置编辑器 -->
+                        <Border Style="{StaticResource BorderStyle}" Padding="16" Margin="5,5,5,10">
+                            <StackPanel>
+                                <TextBlock Text="本机打印与共享配置"
+                                           FontSize="20" FontWeight="Bold"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+                                <TextBlock Text="这一页只放配置，安装打印机、映射共享都在「打印共享」页执行。在这里增删改打印机与共享文件夹，保存后写入当前用户的配置目录，只影响这台电脑，程序升级也不会被覆盖，「打印共享」页的列表会同步更新。凭据以明文保存在本机，公用电脑请勿保存密码。留空密码表示匿名访问。"
+                                           Margin="0,6,0,10" FontSize="13" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="纸张名称" VerticalAlignment="Center" Width="90"
+                                               Foreground="{DynamicResource MainForegroundColor}"/>
+                                    <TextBox Name="WPFEntCfgFormName" Width="190" VerticalContentAlignment="Center" Margin="0,0,16,0"/>
+                                    <TextBlock Text="宽（mm）" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource MainForegroundColor}"/>
+                                    <TextBox Name="WPFEntCfgFormWidth" Width="60" VerticalContentAlignment="Center" Margin="6,0,16,0"/>
+                                    <TextBlock Text="高（mm）" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource MainForegroundColor}"/>
+                                    <TextBox Name="WPFEntCfgFormHeight" Width="60" VerticalContentAlignment="Center" Margin="6,0,16,0"/>
+                                    <TextBlock Text="彩色用户代码" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource MainForegroundColor}"/>
+                                    <TextBox Name="WPFEntCfgColorCode" Width="110" VerticalContentAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="纸张名称与尺寸对易快报打印模式生效；彩色用户代码留空表示彩色模式不带代码。"
+                                           FontSize="11" FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,8"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+
+                                <Separator Margin="0,4,0,6"/>
+                                <TextBlock Text="打印机" FontWeight="Bold" Margin="0,0,0,4"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+                                <StackPanel Name="WPFEntCfgPrinterRows"/>
+                                <Button Name="WPFEntCfgAddPrinter" Content="新增打印机" HorizontalAlignment="Left"
+                                        FontSize="{DynamicResource ConfigTabButtonFontSize}" Padding="14,6" Margin="0,6,0,0"/>
+
+                                <TextBlock Text="共享文件夹" FontWeight="Bold" Margin="0,14,0,4"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+                                <StackPanel Name="WPFEntCfgShareRows"/>
+                                <Button Name="WPFEntCfgAddShare" Content="新增共享文件夹" HorizontalAlignment="Left"
+                                        FontSize="{DynamicResource ConfigTabButtonFontSize}" Padding="14,6" Margin="0,6,0,0"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                    <Button Name="WPFEntCfgSave" Content="保存配置"
+                                            FontSize="{DynamicResource ConfigTabButtonFontSize}"
+                                            Margin="0,0,10,0" Padding="16,8"/>
+                                    <Button Name="WPFEntCfgReset" Content="恢复内置配置"
+                                            FontSize="{DynamicResource ConfigTabButtonFontSize}" Padding="16,8"/>
+                                </StackPanel>
+                                <TextBlock Name="WPFEntCfgSource" Text="" FontSize="11" FontStyle="Italic" Margin="0,8,0,0" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+                                <TextBlock Name="WPFEntCfgStatus" Text="" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource MainForegroundColor}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
         </TabControl>
 
         <!-- Window-level progress indicator - visible regardless of active tab -->

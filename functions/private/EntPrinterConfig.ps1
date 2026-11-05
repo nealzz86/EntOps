@@ -49,7 +49,7 @@ function Update-WinUtilEntPrinterConfig {
         $loaded = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
         Write-WinUtilLog -Level "WARN" -Component "Printers" -Message "本机打印配置解析失败，改用内置配置: $($_.Exception.Message)"
-        Write-Host "  [警告] 本机打印配置（$path）读不懂，已改用程序内置配置。打开「打印共享」页的配置编辑器保存一次即可修复。"
+        Write-Host "  [警告] 本机打印配置（$path）读不懂，已改用程序内置配置。打开「打印与共享设置」页重新保存一次即可修复。"
         return $embedded
     }
 

@@ -17,6 +17,7 @@ BeforeAll {
     $script:panelSource = Get-Content -LiteralPath (Join-Path $repoRoot "functions\private\EntPrinterPanel.ps1") -Raw -Encoding UTF8
     $script:editorSource = Get-Content -LiteralPath (Join-Path $repoRoot "functions\private\EntPrinterEditor.ps1") -Raw -Encoding UTF8
     $script:initSource = Get-Content -LiteralPath (Join-Path $repoRoot "functions\private\Initialize-WinUtilEntPrinterPanel.ps1") -Raw -Encoding UTF8
+    $script:tabContentSource = Get-Content -LiteralPath (Join-Path $repoRoot "functions\private\Initialize-WinUtilTabContent.ps1") -Raw -Encoding UTF8
     $script:handlerSource = Get-Content -LiteralPath (Join-Path $repoRoot "functions\public\Invoke-WPFPrinterInstall.ps1") -Raw -Encoding UTF8
     $script:editorHandlerSource = Get-Content -LiteralPath (Join-Path $repoRoot "functions\public\Invoke-WPFEntPrinterEditor.ps1") -Raw -Encoding UTF8
 
@@ -63,9 +64,14 @@ Describe "选择列表按配置条数生成" {
         $script:panelSource | Should -Match '\[int\]\$box\.Tag'
     }
 
-    It "打开页面时同时刷新选择列表与编辑器" {
+    It "操作页只填选择列表，编辑器由设置页自己加载" {
+        # 两页共用同一份配置，但各填各的控件：操作页重绘勾选列表，设置页重绘编辑行。
+        # 谁多调了一次，另一页的控件在还没被构建时就会读到 null。
         $script:initSource | Should -Match 'Update-WinUtilEntPrinterSelection'
-        $script:initSource | Should -Match 'Show-WinUtilEntPrinterEditor'
+        $script:initSource | Should -Not -Match 'Show-WinUtilEntPrinterEditor'
+        $script:editorSource | Should -Match 'function Initialize-WinUtilEntPrinterSettings'
+        $script:tabContentSource | Should -Match '"PrintShare" \{\s*Initialize-WinUtilEntPrinterPanel\b'
+        $script:tabContentSource | Should -Match '"EntPrinterSettings" \{\s*Initialize-WinUtilEntPrinterSettings\b'
     }
 }
 
@@ -85,13 +91,52 @@ Describe "配置编辑器" {
         }
     }
 
-    It "命令面板能搜到编辑器" {
+    It "命令面板能搜到编辑器，且指向设置页" {
         $buttons = @($script:commands | ForEach-Object { $_.button })
         foreach ($button in @("WPFEntCfgAddPrinter", "WPFEntCfgAddShare", "WPFEntCfgSave", "WPFEntCfgReset")) {
             $buttons | Should -Contain $button
             $command = @($script:commands | Where-Object { $_.button -eq $button })[0]
-            $command.tab | Should -Be "WPFTab7BT"
-            $command.group | Should -Be "打印共享"
+            # 按钮搬去哪个页面，面板就得先跳哪个页面：指向操作页的话搜到也按不着
+            $command.tab | Should -Be "WPFTab13BT"
+            $command.group | Should -Be "打印与共享设置"
+        }
+    }
+
+    It "编辑控件只在设置页，操作页上一个都不留" {
+        [xml] $doc = $script:xamlSource
+        $settings = $doc.SelectSingleNode('//*[local-name()="TabItem"][@Name="WPFTab13"]')
+        $operation = $doc.SelectSingleNode('//*[local-name()="TabItem"][@Name="WPFTab7"]')
+        $settings | Should -Not -BeNullOrEmpty -Because "「打印与共享设置」是编辑器唯一的位置"
+        $operation | Should -Not -BeNullOrEmpty
+        foreach ($name in @("WPFEntCfgPrinterRows", "WPFEntCfgShareRows", "WPFEntCfgFormName", "WPFEntCfgSave", "WPFEntCfgReset")) {
+            # ".//" rather than "//": the search has to start at this tab, otherwise every tab
+            # reports the whole window and both sides of the assertion match the same node.
+            $xpath = './/*[@Name="' + $name + '"]'
+            $settings.SelectSingleNode($xpath) | Should -Not -BeNullOrEmpty -Because "$name 应在设置页"
+            $operation.SelectSingleNode($xpath) | Should -BeNullOrEmpty -Because "$name 已从操作页搬走"
+        }
+    }
+
+    It "侧栏把设置页排在「打印共享」正下方" {
+        # 分开的两页要能一眼找到彼此：排在最后一个页面后面，谁都不会想到配置在那里
+        [xml] $doc = $script:xamlSource
+        $navNames = @($doc.SelectNodes('//*[local-name()="StackPanel"][@Name="NavDockPanel"]/*[local-name()="ToggleButton"]') |
+            ForEach-Object { $_.GetAttribute("Name") })
+        $navNames | Should -Contain "WPFTab13BT"
+        $index = [array]::IndexOf($navNames, "WPFTab7BT")
+        $index | Should -BeGreaterThan -1
+        $navNames[$index + 1] | Should -Be "WPFTab13BT"
+    }
+
+    It "设置页保存后两页一起刷新" {
+        # 只重画编辑器的话，操作页的勾选列表还留着刚被删掉的那台打印机，下一次安装就按一个不存在的名字
+        $script:editorSource | Should -Match 'function Update-WinUtilEntPrinterUiFromConfig'
+        $update = (@($script:editorSource -split "function Update-WinUtilEntPrinterUiFromConfig")[1] -split '\nfunction ')[0]
+        $update | Should -Match 'Initialize-WinUtilEntPrinterPanel'
+        $update | Should -Match 'Initialize-WinUtilEntPrinterSettings'
+        foreach ($handler in @("Invoke-WPFEntPrinterConfigSave", "Invoke-WPFEntPrinterConfigReset")) {
+            $body = (@($script:editorHandlerSource -split "function $handler")[1] -split '\nfunction ')[0]
+            $body | Should -Match 'Update-WinUtilEntPrinterUiFromConfig'
         }
     }
 
@@ -109,7 +154,7 @@ Describe "配置编辑器" {
     It "校验不通过时先说清楚，界面不重建" {
         $save = (@($script:editorHandlerSource -split "function Invoke-WPFEntPrinterConfigSave")[1] -split "function Invoke-WPFEntPrinterConfigReset")[0]
         # 失败分支只报告问题就返回：重建会把刚敲到一半的内容抹掉，那比保存失败更让人恼火
-        $failBranch = $save.Substring(0, $save.IndexOf("Initialize-WinUtilEntPrinterPanel"))
+        $failBranch = $save.Substring(0, $save.IndexOf("Update-WinUtilEntPrinterUiFromConfig"))
         $failBranch | Should -Match 'if \(\$problems\.Count -gt 0\)'
         $failBranch | Should -Match 'Set-WinUtilEntPrinterEditorStatus -Problems'
         $failBranch | Should -Match 'return'
@@ -122,17 +167,27 @@ Describe "配置编辑器" {
         $script:editorSource | Should -Not -Match 'Children\.RemoveAt'
     }
 
+    It "删除按钮不吃主题的固定尺寸" {
+        # 主题的按钮样式把所有按钮钉成 200x25：放进 56 像素的列里，文字被裁走，看上去就是一个空白框
+        $remove = (@($script:editorSource -split "function New-WinUtilEntEditorRemoveButton")[1] -split '\nfunction ')[0]
+        $remove | Should -Match '\$button\.Width = \[double\]::NaN'
+        $remove | Should -Match '\$button\.Height = \[double\]::NaN'
+        $remove | Should -Match '\$button\.MinHeight'
+    }
+
     It "共享密码用密码框，不用明文文本框" {
         $script:editorSource | Should -Match 'System\.Windows\.Controls\.PasswordBox'
         $script:editorSource | Should -Match '\$row\.Pass\.Password'
     }
 
-    It "界面上不出现内网机器名与凭据" {
-        # 这一页的文案是给任何单位用的，具体站点由各自的配置文件提供
-        foreach ($source in @($script:xamlSource)) {
-            $editorCard = $source.Substring($source.IndexOf('本机打印与共享配置'))
-            $editorCard = $editorCard.Substring(0, $editorCard.IndexOf('门店小票打印机网口配置'))
-            $editorCard | Should -Not -Match '\\\\[a-zA-Z0-9_-]+\\'
+    It "两页标记里都没有内网机器名与凭据" {
+        # 这两页的文案是给任何单位用的，具体站点由各自的配置文件提供。出厂默认 IP（芯烨/爱普生）是打印机
+        # 本身的属性，不是现场信息，所以留在界面上。
+        [xml] $doc = $script:xamlSource
+        foreach ($tabName in @("WPFTab7", "WPFTab13")) {
+            $tab = $doc.SelectSingleNode('//*[local-name()="TabItem"][@Name="' + $tabName + '"]')
+            $tab | Should -Not -BeNullOrEmpty
+            $tab.OuterXml | Should -Not -Match '\\\\[a-zA-Z0-9_.-]+\\' -Because "$tabName 不应写死 \\\\服务器\共享"
         }
     }
 }

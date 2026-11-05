@@ -3,12 +3,13 @@ function Show-WinUtilEntPrinterEditor {
     <#
 
     .SYNOPSIS
-        Loads a printer and share configuration into the editing controls on the printing tab
+        Loads a printer and share configuration into the editing controls on the settings page
 
     .DESCRIPTION
         Rebuilds the whole editor, including the printer and share rows, from the configuration that
-        is currently in effect. Called when the tab opens and again after every save, so the rows
-        always show what is actually configured rather than what was typed before a rejected save.
+        is currently in effect. Called when the settings page opens and again after every save, so
+        the rows always show what is actually configured rather than what was typed before a
+        rejected save.
 
     .PARAMETER Config
         The configuration to display
@@ -38,6 +39,34 @@ function Show-WinUtilEntPrinterEditor {
         $sync.WPFEntCfgSource.Text = "当前使用的是程序内置配置。保存后写入 $path，只影响这台电脑。"
     }
     Set-WinUtilEntPrinterEditorStatus -Message ""
+}
+
+function Initialize-WinUtilEntPrinterSettings {
+
+    <#
+
+    .SYNOPSIS
+        Fills the printer and share settings page from the configuration in effect
+
+    #>
+    Show-WinUtilEntPrinterEditor -Config $sync.configs.entprinters
+}
+
+function Update-WinUtilEntPrinterUiFromConfig {
+
+    <#
+
+    .SYNOPSIS
+        Redraws both printing pages from the configuration that now applies
+
+    .DESCRIPTION
+        One call because the two pages read the same config: the settings page shows the rows that
+        were just validated and written, and the operation page's choice lists have to follow them -
+        otherwise the next install runs against a printer name the operator already deleted.
+
+    #>
+    Initialize-WinUtilEntPrinterPanel
+    Initialize-WinUtilEntPrinterSettings
 }
 
 function Clear-WinUtilEntPrinterEditorRows {
@@ -228,6 +257,14 @@ function New-WinUtilEntEditorRemoveButton {
     $button.Content = "删除"
     $button.Padding = New-Object System.Windows.Thickness(8, 2, 8, 2)
     $button.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
+    # The theme's button style pins every Button to 200x25. In a 56 pixel column that leaves a
+    # box with the label clipped away, so the row reads as an empty rectangle: size to the
+    # content instead, and keep a clickable height.
+    $button.Width = [double]::NaN
+    $button.Height = [double]::NaN
+    $button.MinHeight = 26
+    $button.MinWidth = 44
+    $button.VerticalAlignment = [System.Windows.VerticalAlignment]::Center
     $button.Tag = @{ Record = $Record; List = $List; Panel = $Panel }
     # The row object travels in the button's own Tag: the panel is rebuilt from the config whenever
     # the tab opens, and a handler that looked rows up by position would delete the wrong one.

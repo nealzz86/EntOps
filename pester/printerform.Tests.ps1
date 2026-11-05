@@ -88,16 +88,23 @@ public static class EntSpool
 {
     public static List<string> Calls = new List<string>();
     public static bool FormResult = true;
+    public static string Effective = "1|256|1400|2400|测试小票纸";
 
     public static void SetColorMode(string printerName, bool color)
     {
         Calls.Add("SetColorMode|" + printerName + "|" + color);
     }
 
-    public static bool RegisterPaperForm(string printerName, string formName, int widthTenthMm, int heightTenthMm)
+    public static bool RegisterPaperForm(string printerName, string formName, int widthTenthMm, int heightTenthMm, int colorMode)
     {
-        Calls.Add("RegisterPaperForm|" + printerName + "|" + formName + "|" + widthTenthMm + "|" + heightTenthMm);
+        Calls.Add("RegisterPaperForm|" + printerName + "|" + formName + "|" + widthTenthMm + "|" + heightTenthMm + "|" + colorMode);
         return FormResult;
+    }
+
+    public static string ReadEffectiveDefaults(string printerName)
+    {
+        Calls.Add("ReadEffectiveDefaults|" + printerName);
+        return Effective;
     }
 }
 "@
@@ -109,11 +116,21 @@ public static class EntSpool
         # log drain would reach for the real EntNative type.
         function script:Add-WinUtilEntNatives { }
         function script:Write-WinUtilEntNativeLog { }
+
+        # The helper's whole job now is to tell the operator what the driver accepted, so the tests
+        # have to read its lines back. A function shadow wins over the cmdlet for calls made from
+        # this file's scope, which keeps the pane out of the test run.
+        $script:HostLines = [System.Collections.ArrayList]::Synchronized((New-Object System.Collections.ArrayList))
+        function script:Write-Host {
+            $null = $script:HostLines.Add(($args -join ' '))
+        }
     }
 
     BeforeEach {
         [EntSpool]::Calls.Clear()
         [EntSpool]::FormResult = $true
+        [EntSpool]::Effective = "1|256|1400|2400|测试小票纸"
+        $null = $script:HostLines.Clear()
         $script:sync = [Hashtable]::Synchronized(@{
             configs = @{
                 entprinters = [pscustomobject]@{
@@ -136,7 +153,7 @@ public static class EntSpool
 
         Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
 
-        [EntSpool]::Calls | Should -Contain "RegisterPaperForm|前台打印机|测试小票纸|1400|2400"
+        [EntSpool]::Calls | Should -Contain "RegisterPaperForm|前台打印机|测试小票纸|1400|2400|0"
     }
 
     It "locks a black and white unit to monochrome" {
@@ -172,5 +189,57 @@ public static class EntSpool
         $printer = [pscustomobject]@{ Name = "前台打印机"; SupportColor = $true }
 
         Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
+    }
+
+    It "carries the mono intent into the registry DEVMODE, not only the queue call" {
+        # SetPrinter alone does not stick on this class of driver; the blob the spooler reloads at
+        # startup is the one that decides, so it has to carry dmColor too.
+        $printer = [pscustomobject]@{ Name = "财务打印机"; SupportColor = $false }
+
+        Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
+
+        [EntSpool]::Calls | Should -Contain "RegisterPaperForm|财务打印机|测试小票纸|1400|2400|1"
+    }
+
+    It "reads the defaults back from the driver after the restart" {
+        $printer = [pscustomobject]@{ Name = "前台打印机"; SupportColor = $true }
+
+        Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
+
+        $read = @([EntSpool]::Calls | Where-Object { $_ -like "ReadEffectiveDefaults*" })
+        $read.Count | Should -BeGreaterThan 0 -Because "a write the driver never acknowledged is not a finished job"
+    }
+
+    It "confirms the paper size only when the read-back matches" {
+        $printer = [pscustomobject]@{ Name = "前台打印机"; SupportColor = $true }
+
+        Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
+
+        ($script:HostLines -join "`n") | Should -Match '默认纸张已生效'
+    }
+
+    It "says out loud when the driver clamps the custom size back" {
+        # 现场就是这样：通用 V4 驱动只认自己清单里的纸，把 140×240 退回 A4。工具如果照旧报
+        # 「配置完成」，运维到门店对着下拉框才发现选不到，白跑一趟。
+        [EntSpool]::Effective = "2|9|2100|2970|"
+        $printer = [pscustomobject]@{ Name = "前台打印机"; SupportColor = $true }
+
+        Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
+
+        $text = $script:HostLines -join "`n"
+        $text | Should -Match '没有采纳 140×240mm'
+        $text | Should -Match '自定义纸张尺寸'
+        $text | Should -Not -Match '默认纸张已生效'
+    }
+
+    It "reports a mono lock that the driver ignored" {
+        [EntSpool]::Effective = "2|256|1400|2400|测试小票纸"
+        $printer = [pscustomobject]@{ Name = "财务打印机"; SupportColor = $false }
+
+        Set-WinUtilPrinterPaperAndColor -Printer $printer | Should -BeTrue
+
+        $text = $script:HostLines -join "`n"
+        $text | Should -Match '黑白未生效'
+        $text | Should -Match '默认纸张已生效'
     }
 }

@@ -127,7 +127,9 @@ public static class EntSpool
 
     private const int DM_IN_BUFFER = 1;
     private const int DM_OUT_BUFFER = 2;
-    private const int DMPAPER_USER = 0;
+    // 自定义纸张的 dmPaperSize 取值；本机驱动的 DC_PAPERS 里「自定义纸张尺寸」就是 256，
+    // 原工具写的 0 是无效值，注册表会被驱动退回到清单里的第一种纸。
+    private const int DMPAPER_USER = 256;
 
     private const int DM_PAPERSIZE   = 0x00000002;
     private const int DM_PAPERLENGTH = 0x00000004;
@@ -166,6 +168,13 @@ public static class EntSpool
 
     [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern bool AddForm(IntPtr hPrinter, uint Level, IntPtr pForm);
+
+    [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool SetForm(IntPtr hPrinter, uint Level, IntPtr pForm);
+
+    [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool EnumForms(IntPtr hPrinter, uint Level, IntPtr pForm, uint cbBuf,
+        ref uint pcbNeeded, ref uint pcReturned);
 
     [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern int DocumentProperties(IntPtr hwnd, IntPtr hPrinter, string pDeviceName,
@@ -399,7 +408,7 @@ public static class EntSpool
                     EntNative.Say("[警告] SetPrinter 设置颜色失败，错误码=" + Marshal.GetLastWin32Error());
                     return;
                 }
-                EntNative.Say("默认颜色模式已设为：" + (color ? "彩色" : "黑白"));
+                EntNative.Say("已通过队列设置提交颜色模式：" + (color ? "彩色" : "黑白") + "（生效情况稍后回读确认）");
             }
             finally { Marshal.FreeHGlobal(pPrinterInfo); }
         }
@@ -411,9 +420,39 @@ public static class EntSpool
         }
     }
 
+    /// <summary>在打印服务器的纸张表里按名字找一张纸的尺寸（单位 1/100 mm）。</summary>
+    private static bool TryFindForm(IntPtr hPrinter, string formName, out int cxUm, out int cyUm)
+    {
+        cxUm = 0;
+        cyUm = 0;
+        uint needed = 0, returned = 0;
+        EnumForms(hPrinter, 1, IntPtr.Zero, 0, ref needed, ref returned);
+        if (needed == 0) return false;
+
+        IntPtr buf = Marshal.AllocHGlobal((int)needed);
+        try
+        {
+            if (!EnumForms(hPrinter, 1, buf, needed, ref needed, ref returned)) return false;
+            int stride = Marshal.SizeOf(typeof(EntFormInfo1));
+            for (int i = 0; i < returned; i++)
+            {
+                EntFormInfo1 f = (EntFormInfo1)Marshal.PtrToStructure(IntPtr.Add(buf, i * stride), typeof(EntFormInfo1));
+                if (string.Equals(f.pName, formName, StringComparison.OrdinalIgnoreCase))
+                {
+                    cxUm = f.Size.cx;
+                    cyUm = f.Size.cy;
+                    return true;
+                }
+            }
+            return false;
+        }
+        finally { Marshal.FreeHGlobal(buf); }
+    }
+
     /// <summary>注册自定义纸张并直写注册表 Default DevMode（RICOH 驱动读取默认设置的权威位置）。
-    /// 对应原工具「易快报打印模式」步骤，绕过驱动 DocumentProperties 合并拒绝逻辑。</summary>
-    public static bool RegisterPaperForm(string printerName, string formName, int widthTenthMm, int heightTenthMm)
+    /// 对应原工具「易快报打印模式」步骤，绕过驱动 DocumentProperties 合并拒绝逻辑。
+    /// 只保证"写进去了"，不保证驱动认账——生效与否由 ReadEffectiveDefaults 在安装完回读判定。</summary>
+    public static bool RegisterPaperForm(string printerName, string formName, int widthTenthMm, int heightTenthMm, int colorMode = 0)
     {
         IntPtr hPrinter = IntPtr.Zero;
         IntPtr pDevMode = IntPtr.Zero;
@@ -446,7 +485,27 @@ public static class EntSpool
                 if (!AddForm(hPrinter, 1, pForm))
                 {
                     int err = Marshal.GetLastWin32Error();
-                    if (err == 183 || err == 80) EntNative.Say("纸张规格已存在于打印服务器。");
+                    if (err == 183 || err == 80)
+                    {
+                        // 表里已有同名纸张不代表尺寸对：门店换过规格时留下的旧尺寸必须纠正过来，
+                        // 否则写进 DEVMODE 的表单名指向的还是上一版的纸。但尺寸本来就对时不能报Warning，
+                        // 否则每次重设都吓操作台一次。
+                        int haveCx, haveCy;
+                        bool found = TryFindForm(hPrinter, formName, out haveCx, out haveCy);
+                        if (found && haveCx == widthUm && haveCy == heightUm)
+                        {
+                            EntNative.Say("纸张规格已存在于打印服务器：" + formName + " (" + (widthUm / 1000.0) + "×" + (heightUm / 1000.0) + " mm)");
+                        }
+                        else if (SetForm(hPrinter, 1, pForm))
+                        {
+                            EntNative.Say("已按配置纠正同名纸张规格：" + formName + " (" + (widthUm / 1000.0) + "×" + (heightUm / 1000.0) + " mm)");
+                        }
+                        else
+                        {
+                            string have = found ? ((haveCx / 1000.0) + "×" + (haveCy / 1000.0) + " mm") : "尺寸读不到";
+                            EntNative.Say("[警告] 同名纸张当前是 " + have + "，驱动不允许改写（错误码=" + Marshal.GetLastWin32Error() + "），打印出的尺寸可能仍按旧纸张。");
+                        }
+                    }
                     else EntNative.Say("[警告] AddForm 失败，错误码=" + err + "，继续尝试写 DEVMODE...");
                 }
                 else
@@ -468,10 +527,15 @@ public static class EntSpool
 
             int dmFields = Marshal.ReadInt32(pDevMode, DM_OFFSET_FIELDS);
             dmFields |= DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH | DM_FORMNAME;
-            Marshal.WriteInt32(pDevMode, DM_OFFSET_FIELDS, dmFields);
             Marshal.WriteInt16(pDevMode, DM_OFFSET_PAPERSIZE, (short)DMPAPER_USER);
             Marshal.WriteInt16(pDevMode, DM_OFFSET_PAPERLENGTH, (short)heightTenthMm);
             Marshal.WriteInt16(pDevMode, DM_OFFSET_PAPERWIDTH, (short)widthTenthMm);
+            if (colorMode == DMCOLOR_MONOCHROME || colorMode == DMCOLOR_COLOR)
+            {
+                dmFields |= DM_COLOR;
+                Marshal.WriteInt16(pDevMode, DM_OFFSET_COLOR, (short)colorMode);
+            }
+            Marshal.WriteInt32(pDevMode, DM_OFFSET_FIELDS, dmFields);
             char[] chars = formName.ToCharArray();
             for (int i = 0; i < 32; i++)
             {
@@ -497,10 +561,49 @@ public static class EntSpool
             }
             catch (Exception ex) { EntNative.Say("[警告] 写注册表失败：" + ex.Message); }
 
-            EntNative.Say("纸张模式配置完成（" + (widthTenthMm / 10.0) + "×" + (heightTenthMm / 10.0) + " mm）");
+            EntNative.Say("已把 " + formName + "（" + (widthTenthMm / 10.0) + "×" + (heightTenthMm / 10.0) + " mm）写入默认设置，等驱动重载后回读确认。");
             return true;
         }
         catch (Exception ex) { EntNative.Say("[异常] " + ex.Message); return false; }
+        finally
+        {
+            if (pDevMode != IntPtr.Zero) Marshal.FreeHGlobal(pDevMode);
+            if (hPrinter != IntPtr.Zero) ClosePrinter(hPrinter);
+        }
+    }
+
+    /// <summary>回读驱动当前真正交给应用程序的默认设置（DocumentProperties 的 DM_OUT_BUFFER 结果）。
+    /// 注册表里写的值驱动可以不认账，尤其是 V4 驱动的纸张尺寸，所以安装完必须从这里读，
+    /// 而不是拿"写入调用返回成功"当结论。
+    /// 返回 "dmColor|dmPaperSize|dmPaperWidth|dmPaperLength|dmFormName"，读不到时返回 "error|原因"。</summary>
+    public static string ReadEffectiveDefaults(string printerName)
+    {
+        IntPtr hPrinter = IntPtr.Zero;
+        IntPtr pDevMode = IntPtr.Zero;
+        try
+        {
+            EntPrinterDefaults pd = Defaults(PRINTER_ACCESS_USE);
+            if (!OpenPrinter(printerName, out hPrinter, ref pd))
+                return "error|OpenPrinter " + Marshal.GetLastWin32Error();
+
+            int size = DocumentProperties(IntPtr.Zero, hPrinter, printerName, IntPtr.Zero, IntPtr.Zero, 0);
+            if (size <= 0) return "error|DocumentProperties 查询大小失败";
+
+            pDevMode = Marshal.AllocHGlobal(size);
+            if (DocumentProperties(IntPtr.Zero, hPrinter, printerName, pDevMode, IntPtr.Zero, DM_OUT_BUFFER) <= 0)
+                return "error|DocumentProperties 读取默认值失败";
+
+            string form = Marshal.PtrToStringUni(IntPtr.Add(pDevMode, DM_OFFSET_FORMNAME), 32);
+            if (form == null) form = "";
+            form = form.TrimEnd('\0');
+
+            return Marshal.ReadInt16(pDevMode, DM_OFFSET_COLOR) + "|" +
+                   Marshal.ReadInt16(pDevMode, DM_OFFSET_PAPERSIZE) + "|" +
+                   Marshal.ReadInt16(pDevMode, DM_OFFSET_PAPERWIDTH) + "|" +
+                   Marshal.ReadInt16(pDevMode, DM_OFFSET_PAPERLENGTH) + "|" +
+                   form;
+        }
+        catch (Exception ex) { return "error|" + ex.Message; }
         finally
         {
             if (pDevMode != IntPtr.Zero) Marshal.FreeHGlobal(pDevMode);

@@ -64,7 +64,15 @@
       "label": "打印共享",
       "group": "打印共享",
       "tab": "WPFTab7BT",
-      "keywords": "打印机 共享 小票 票据 打印 网段",
+      "keywords": "打印机 共享 小票 票据 打印 网段 安装 映射",
+      "action": "goto"
+    },
+    {
+      "button": "WPFTab13BT",
+      "label": "打印与共享设置",
+      "group": "打印与共享设置",
+      "tab": "WPFTab13BT",
+      "keywords": "设置 配置 打印机 共享文件夹 本机 新增 删除 保存 恢复内置",
       "action": "goto"
     },
     {
@@ -358,32 +366,32 @@
     {
       "button": "WPFEntCfgAddPrinter",
       "label": "新增打印机配置",
-      "group": "打印共享",
-      "tab": "WPFTab7BT",
+      "group": "打印与共享设置",
+      "tab": "WPFTab13BT",
       "keywords": "打印机 新增 添加 配置 自定义 本机",
       "action": "run"
     },
     {
       "button": "WPFEntCfgAddShare",
       "label": "新增共享文件夹配置",
-      "group": "打印共享",
-      "tab": "WPFTab7BT",
+      "group": "打印与共享设置",
+      "tab": "WPFTab13BT",
       "keywords": "共享 文件夹 新增 添加 配置 盘符 自定义",
       "action": "run"
     },
     {
       "button": "WPFEntCfgSave",
       "label": "保存本机打印与共享配置",
-      "group": "打印共享",
-      "tab": "WPFTab7BT",
+      "group": "打印与共享设置",
+      "tab": "WPFTab13BT",
       "keywords": "保存 配置 打印机 共享 本机 自定义 生效",
       "action": "run"
     },
     {
       "button": "WPFEntCfgReset",
       "label": "恢复内置打印与共享配置",
-      "group": "打印共享",
-      "tab": "WPFTab7BT",
+      "group": "打印与共享设置",
+      "tab": "WPFTab13BT",
       "keywords": "恢复 重置 删除 本机 配置 内置 默认 打印机 共享",
       "action": "run"
     },

@@ -8,8 +8,10 @@ function Initialize-WinUtilEntPrinterPanel {
     .DESCRIPTION
         The interface markup carries no machine names, addresses or share accounts: they belong to
         one site only, and the published build is meant to be reusable elsewhere. Whatever the
-        config holds is written onto the controls here, and the choice lists are regenerated on
-        every visit to the tab so an edit made in the configuration editor shows up at once.
+        config holds is written onto the controls here, which is the operation half of the feature:
+        the choice lists and the buttons that run against them. Adding or renaming an entry is done
+        on the 「打印与共享设置」 page, and saving there refreshes these lists in place so the
+        operator never installs against a stale name.
 
     #>
 
@@ -38,6 +40,4 @@ function Initialize-WinUtilEntPrinterPanel {
     if ($mapButton) {
         $mapButton.IsEnabled = ($shares.Count -gt 0)
     }
-
-    Show-WinUtilEntPrinterEditor -Config $cfg
 }

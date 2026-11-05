@@ -15,7 +15,7 @@ function Invoke-WPFPrinterInstall {
     $printerIndex = Get-WinUtilSelectedPrinterIndex
     $printer = if ($printerIndex -ge 0) { @($cfg.printers)[$printerIndex] } else { $null }
     if (-not $printer) {
-        Write-Host "  没有选中的打印机，请先在「本机打印与共享配置」里添加。"
+        Write-Host "  没有选中的打印机，请先在「打印与共享设置」页添加并保存。"
         return
     }
 
@@ -66,7 +66,7 @@ function Invoke-WPFPrinterFormColorOnly {
     $printerIndex = Get-WinUtilSelectedPrinterIndex
     $printer = if ($printerIndex -ge 0) { @($cfg.printers)[$printerIndex] } else { $null }
     if (-not $printer) {
-        Write-Host "  没有选中的打印机，请先在「本机打印与共享配置」里添加。"
+        Write-Host "  没有选中的打印机，请先在「打印与共享设置」页添加并保存。"
         return
     }
 
@@ -98,7 +98,7 @@ function Invoke-WPFPrinterFormColorOnly {
 
         Step-WinUtilJob -Status "1/2 · 配置易快报打印模式中…" -Percent 0
         if (-not (Set-WinUtilPrinterPaperAndColor -Printer $Printer)) {
-            Write-Host "  [错误] 易快报纸张配置失败，颜色模式已经生效。可重启电脑后重试。"
+            Write-Host "  [错误] 纸张规格没能写进这台打印机，颜色和纸张都还按驱动原样。可重启电脑后重试。"
             Step-WinUtilJob -Status "纸张配置失败" -Percent 100 -State Error
             Write-WinUtilLog -Level "ERROR" -Component "Printers" -Message "Paper form registration failed: $($Printer.Name)"
             return
@@ -112,10 +112,10 @@ function Invoke-WPFPrinterFormColorOnly {
         $sizeText = "$([int]($entCfg.formWidthTenthMm / 10))×$([int]($entCfg.formHeightTenthMm / 10))mm"
         Write-Host ""
         Write-Host "======================================================"
-        Write-Host "              ✅ 纸张与颜色已重设"
+        Write-Host "              纸张与颜色设置已提交"
         Write-Host "======================================================"
-        Write-Host "1. 打印时纸张下拉框应显示「$($entCfg.formName)」"
-        Write-Host "2. 如仍看不到，请在打印对话框选择「自定义纸张尺寸」手动输入 $sizeText"
+        Write-Host "1. 以画面上面的回读结果为准：写着「已生效」的项，打印对话框里就能直接看到"
+        Write-Host "2. 若提示驱动没采纳这张自定义纸，请在打印对话框选择「自定义纸张尺寸」手动输入 $sizeText"
         Write-Host "3. 本次只改纸张与颜色，端口和驱动没有动"
         Write-Host "如有问题，请联系信息部，谢谢！"
         Write-Host "======================================================"

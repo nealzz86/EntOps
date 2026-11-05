@@ -42,8 +42,9 @@ function Invoke-WPFEntPrinterConfigSave {
     .DESCRIPTION
         Runs on the interface thread: it is a file write of a few kilobytes, and putting it in a job
         would make the operator wait behind the progress bar for something that finishes before the
-        bar could paint. On success the whole printing tab is rebuilt from the saved configuration,
-        so the selection lists above show exactly what was written.
+        bar could paint. On success both printing pages are rebuilt from the saved configuration -
+        the rows here and the choice lists on the 「打印共享」 page - so nothing on screen is left
+        describing a config that no longer applies.
 
     .PARAMETER Button
         Unused; present so the generic button router can pass it through
@@ -61,8 +62,8 @@ function Invoke-WPFEntPrinterConfigSave {
     }
 
     # Rebuilds the rows as well, which clears any status line from the previous attempt
-    Initialize-WinUtilEntPrinterPanel
-    Set-WinUtilEntPrinterEditorStatus -Message "已保存到 $(Get-WinUtilEntPrinterConfigPath)，上方列表已同步更新。"
+    Update-WinUtilEntPrinterUiFromConfig
+    Set-WinUtilEntPrinterEditorStatus -Message "已保存到 $(Get-WinUtilEntPrinterConfigPath)，「打印共享」页的列表已同步更新。"
     Write-Host "  本机打印与共享配置已保存。"
 }
 
@@ -96,7 +97,7 @@ function Invoke-WPFEntPrinterConfigReset {
     }
 
     Remove-WinUtilEntPrinterConfig
-    Initialize-WinUtilEntPrinterPanel
+    Update-WinUtilEntPrinterUiFromConfig
     Set-WinUtilEntPrinterEditorStatus -Message "已删除本机配置，当前使用程序内置配置。"
     Write-Host "  已恢复内置打印与共享配置。"
 }

@@ -321,7 +321,8 @@ Describe "Command catalog config" {
         $groups = @(Get-WinUtilCommandGroup -Commands $script:realCatalog)
 
         $groups.Count | Should -BeGreaterOrEqual 10
-        $groups.Count | Should -BeLessOrEqual 12
+        # One group per sidebar page, plus AppX, which is reached from a button instead of the rail.
+        $groups.Count | Should -BeLessOrEqual 13
         $groups | Should -Contain $script:wordPrintShare
         @($groups | Where-Object { [string]$_ -notmatch '[\u4e00-\u9fff]' }).Count | Should -Be 0
     }

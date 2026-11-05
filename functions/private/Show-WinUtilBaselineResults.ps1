@@ -129,6 +129,12 @@ function Show-WinUtilBaselineResults {
                 $caption = [string]$row.FixText
                 if ([string]::IsNullOrWhiteSpace($caption)) { $caption = "处理" }
                 $fixButton.Content = $caption
+                # Same trap as the printer editor's rows: the theme's button style pins every Button
+                # to 200x25, which is wider than this column and too short for the label.
+                $fixButton.Width = [double]::NaN
+                $fixButton.Height = [double]::NaN
+                $fixButton.MinHeight = 26
+                $fixButton.MinWidth = 60
                 $fixButton.Tag = [string]$row.FixButton
                 $fixButton.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Right
                 $fixButton.Add_Click({ Invoke-WPFButton -Button $this.Tag })

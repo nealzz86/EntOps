@@ -13,6 +13,9 @@ function Set-WinUtilPrinterPaperAndColor {
         Runs inside a WinUtil job, so it must not touch WPF controls directly. Returns $true once
         the form is registered and $false when the driver refused it, leaving the caller to say
         what a refusal means for its own flow.
+        After the spooler reloads, the effective defaults are read back from the driver and
+        reported: a write that the driver silently rejects is told to the operator as a refusal,
+        not as a finished job.
 
     .PARAMETER Printer
         Printer config object from configs.entprinters.printers
@@ -24,14 +27,15 @@ function Set-WinUtilPrinterPaperAndColor {
     Add-WinUtilEntNatives
 
     # 黑白机强制 dmColor=MONOCHROME
-    if (-not $Printer.SupportColor) {
+    $wantMono = -not $Printer.SupportColor
+    if ($wantMono) {
         [EntSpool]::SetColorMode($Printer.Name, $false)
         Write-WinUtilEntNativeLog
     }
 
     $widthMm = [int] ($cfg.formWidthTenthMm / 10)
     $heightMm = [int] ($cfg.formHeightTenthMm / 10)
-    $formOk = [EntSpool]::RegisterPaperForm($Printer.Name, $cfg.formName, [int] $cfg.formWidthTenthMm, [int] $cfg.formHeightTenthMm)
+    $formOk = [EntSpool]::RegisterPaperForm($Printer.Name, $cfg.formName, [int] $cfg.formWidthTenthMm, [int] $cfg.formHeightTenthMm, $(if ($wantMono) { 1 } else { 0 }))
     Write-WinUtilEntNativeLog
     if (-not $formOk) { return $false }
 
@@ -42,7 +46,38 @@ function Set-WinUtilPrinterPaperAndColor {
     } catch {
         Write-Host "  [警告] 重启 Spooler 失败：$($_.Exception.Message)"
     }
-    Write-Host "  提示：如打印首选项下拉框未显示该纸张，请在应用中选择「自定义纸张尺寸」手动输入 ${widthMm}×${heightMm}mm。"
+
+    # 写入调用返回成功不等于驱动认账：V4 驱动会在自己那份 DEVMODE 上把不要的字段改回去，
+    # 界面必须报驱动实际生效的值，否则运维会拿着"配置完成"去现场才发现下拉框里根本没有那张纸。
+    $eff = @()
+    foreach ($attempt in 1..3) {
+        $eff = ([EntSpool]::ReadEffectiveDefaults($Printer.Name) -split '\|')
+        if ($eff.Count -ge 5 -and $eff[0] -ne 'error') { break }
+        if ($eff.Count -lt 5 -or $eff[0] -eq 'error') { Start-Sleep -Milliseconds 800 }
+    }
+
+    if ($eff.Count -lt 5 -or $eff[0] -eq 'error') {
+        Write-Host "  [提示] 无法回读驱动的默认设置（$($eff -join ' ')），请按上面提示自行确认。"
+        return $true
+    }
+
+    $effColor = [int] $eff[0]
+    $effWidth = [int] $eff[2]
+    $effHeight = [int] $eff[3]
+
+    if ($wantMono) {
+        if ($effColor -eq 1) { Write-Host "  黑白已生效：这台打印机现在默认单色输出。" }
+        else { Write-Host "  [警告] 黑白未生效，驱动回读仍是彩色（dmColor=$effColor）。这台设备的驱动不认队列默认值里的颜色字段，需要在业务软件的打印设置里逐次选黑白。" }
+    }
+
+    if ($effWidth -eq [int] $cfg.formWidthTenthMm -and $effHeight -eq [int] $cfg.formHeightTenthMm) {
+        Write-Host "  默认纸张已生效：${widthMm}×${heightMm}mm。"
+    } else {
+        $effMm = "$([math]::Round($effWidth / 10))×$([math]::Round($effHeight / 10))mm"
+        Write-Host "  [注意] 「$($cfg.formName)」已登记进打印服务器的纸张表，但驱动回读的默认纸张仍是 $effMm，没有采纳 ${widthMm}×${heightMm}mm。"
+        Write-Host "  这类 V4 驱动只把出厂清单里的纸张交给应用程序，所以 Windows 打印首选项的下拉框选不到这张自定义纸——是驱动限制，不是本机没配置。"
+        Write-Host "  两个办法：① 在业务软件的打印设置里手动输入 ${widthMm}×${heightMm}mm（选「自定义纸张尺寸」）；② 装这台机型对应的专用驱动，通用驱动通常不容纳自定义纸。"
+    }
 
     return $true
 }

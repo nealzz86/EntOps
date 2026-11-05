@@ -57,6 +57,11 @@ function Initialize-WinUtilTabContent {
             "PrintShare" {
                 Initialize-WinUtilEntPrinterPanel
             }
+            # The settings page edits the same config the page above runs against, and only saving
+            # carries a change over; opening it just loads what is currently in effect.
+            "EntPrinterSettings" {
+                Initialize-WinUtilEntPrinterSettings
+            }
             # The checklist page is static markup, so all its first visit needs is the empty table
             # saying the check-up has not run yet
             "Baseline" {
